@@ -1,6 +1,5 @@
 "use client";
 import { FC } from "react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,15 +16,15 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useFormState, useFormStatus } from "react-dom";
 import { ServerActionResponse } from "../common/server-action-response";
 import { RegisterUser } from "./authenticate-store";
-import { LoadingIndicator } from "@/components/ui/loading";
 import Link from "next/link";
+import { LoadingIndicator } from "@/components/ui/loading";
 
-interface RegisterProps {}
+interface RegisterProps { }
 
 export const RegisterPage: FC<RegisterProps> = (props) => {
 
-    const initialState: ServerActionResponse | undefined = undefined;
-    const [formState, formAction] = useFormState(RegisterUser, initialState);
+  const initialState: ServerActionResponse | undefined = undefined;
+  const [formState, formAction] = useFormState(RegisterUser, initialState);
 
   return (
     <Card className="flex gap-2 flex-col min-w-[350px]">
@@ -73,16 +72,16 @@ export const RegisterPage: FC<RegisterProps> = (props) => {
               placeholder="Confirm Password"
             />
           </div>
-            {formState && formState.status === "OK" ? null : (
+          {formState && formState.status === "OK" ? null : (
             <>
-                {formState &&
+              {formState &&
                 formState.errors.map((error, index) => (
-                    <div key={index} className="text-red-500">
+                  <div key={index} className="text-red-500">
                     {error.message}
-                    </div>
+                  </div>
                 ))}
             </>
-            )}
+          )}
           <Submit />
         </form>
         <CardFooter>
@@ -99,11 +98,11 @@ export const RegisterPage: FC<RegisterProps> = (props) => {
 };
 
 function Submit() {
-    const status = useFormStatus();
-    return (
-      <Button disabled={status.pending} className="gap-2">
-        <LoadingIndicator isLoading={status.pending} />
-        Register
-      </Button>
-    );
+  const status = useFormStatus();
+  return (
+    <Button disabled={status.pending} className="gap-2">
+      <LoadingIndicator isLoading={status.pending} />
+      Register
+    </Button>
+  );
 }

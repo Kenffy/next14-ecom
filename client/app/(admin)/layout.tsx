@@ -1,5 +1,5 @@
 
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/features/admin/dashboard/sidebar/sidebar";
 import { AdminHeader } from "@/features/admin/header/header";
 import { AuthenticatedProviders } from "@/features/globals/providers";
@@ -23,12 +23,12 @@ export default async function AdminLayout({
             <div className={cn("flex flex-1 items-stretch min-h-screen")}>
                 <SidebarProvider>
                     <AppSidebar />
-                    <div className="flex-1 flex flex-col p-2">
+                    <SidebarInset className="flex-1 flex flex-col mx-auto">
                         <>
                             <AdminHeader />
                             {children}
                         </>
-                    </div>
+                    </SidebarInset>
                 </SidebarProvider>
             </div>
         </AuthenticatedProviders>

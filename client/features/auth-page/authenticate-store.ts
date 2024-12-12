@@ -1,12 +1,29 @@
 import { proxy, useSnapshot } from "valtio";
-import { ServerActionError, ServerActionResponse, zodErrorsToServerActionErrors } from "../common/server-action-response";
+import {
+  ServerActionError,
+  ServerActionResponse,
+  zodErrorsToServerActionErrors,
+} from "../common/server-action-response";
 import { RedirectToPage, RevalidateCache } from "../common/navigation-helpers";
 import { showSuccess } from "../globals/global-message-store";
 import { signIn } from "next-auth/react";
 import { UserModel } from "@/schemas/models";
-import { ChangePasswordModel, ChangePasswordSchema, RegisterUserModel, RegisterUserSchema, ResetPasswordModel, ResetPasswordSchema, UpdateUserModel, UpdateUserSchema } from "../common/models";
-import { ChangePasswordAsync, RegisterAsync, ResetPasswordAsync, UpdateUserAsync } from "./auth-service";
-
+import {
+  ChangePasswordModel,
+  ChangePasswordSchema,
+  RegisterUserModel,
+  RegisterUserSchema,
+  ResetPasswordModel,
+  ResetPasswordSchema,
+  UpdateUserModel,
+  UpdateUserSchema,
+} from "../common/models";
+import {
+  ChangePasswordAsync,
+  RegisterAsync,
+  ResetPasswordAsync,
+  UpdateUserAsync,
+} from "./auth-service";
 
 interface FormState {
   success: boolean;
@@ -24,8 +41,8 @@ class AuthenticateState {
     firstName: "",
     email: "",
     password: "",
-    isAdmin: false
-  }
+    isAdmin: false,
+  };
 
   public errors: string[] = [];
   public user: UserModel = { ...this.defaultModel };
@@ -40,7 +57,7 @@ class AuthenticateState {
     };
     this.isOpened = true;
   }
-  
+
   public updateOpened(value: boolean) {
     this.isOpened = value;
   }
@@ -51,17 +68,17 @@ class AuthenticateState {
 
   public updateUser(user: UserModel) {
     this.user = {
-        ...user,
+      ...user,
     };
-    this.role = user.isAdmin ? "admin": "user";
+    this.role = user.isAdmin ? "admin" : "user";
     this.isOpened = true;
   }
 
   public updatePassword(user: UserModel) {
     this.user = {
-        ...user,
+      ...user,
     };
-    this.role = user.isAdmin ? "admin": "user";
+    this.role = user.isAdmin ? "admin" : "user";
     this.isPasswordChange = true;
   }
 
@@ -74,7 +91,7 @@ class AuthenticateState {
   }
 
   public updateErrors(errors: string[]) {
-      this.errors = errors;
+    this.errors = errors;
   }
 }
 
@@ -87,82 +104,82 @@ export const useAuthenticateState = () => {
 };
 
 export const RegisterUser = async (
-    previous: any,
-    formData: FormData
-  ): Promise<ServerActionResponse<UserModel>> => {
-    authenticateStore.updateErrors([]);
+  previous: any,
+  formData: FormData
+): Promise<ServerActionResponse<UserModel>> => {
+  authenticateStore.updateErrors([]);
 
-    const registerModel : RegisterUserModel = {
-        email: formData.get("email") as string,
-        username: formData.get("username") as string,
-        password: formData.get("password") as string,
-        confirmPassword: formData.get("confirmPassword") as string,
-    };
+  const registerModel: RegisterUserModel = {
+    email: formData.get("email") as string,
+    username: formData.get("username") as string,
+    password: formData.get("password") as string,
+    confirmPassword: formData.get("confirmPassword") as string,
+  };
 
-    // schema validation
-    const validatedFields = validateSchema(registerModel, RegisterUserSchema);
-    if(validatedFields.status === "ERROR"){
-      return validatedFields
-    }
+  // schema validation
+  const validatedFields = validateSchema(registerModel, RegisterUserSchema);
+  if (validatedFields.status === "ERROR") {
+    return validatedFields;
+  }
 
-    const response = await RegisterAsync({
-        email: registerModel.email,
-        username: registerModel.username,
-        password: registerModel.password,
-        isAdmin: false
+  const response = await RegisterAsync({
+    email: registerModel.email,
+    username: registerModel.username,
+    password: registerModel.password,
+    isAdmin: false,
+  });
+
+  if (response.status === "OK") {
+    showSuccess({
+      title: "User Registration",
+      description: " User registration successfully.",
     });
-  
-    if (response.status === "OK") {
-      showSuccess({
-        title: "User Registration",
-        description: " User registration successfully."
-      });
-      authenticateStore.updateOpened(false);
-      RedirectToPage("login");
-    } else {
-        authenticateStore.updateErrors(response.errors.map((e) => e.message));
-    }
-    return response;
+    authenticateStore.updateOpened(false);
+    RedirectToPage("login");
+  } else {
+    authenticateStore.updateErrors(response.errors.map((e) => e.message));
+  }
+  return response;
 };
 
 export const UpdateUser = async (
-    previous: any,
-    formData: FormData
-  ): Promise<ServerActionResponse<UserModel>> => {
-    authenticateStore.updateErrors([]);
+  previous: any,
+  formData: FormData
+): Promise<ServerActionResponse<UserModel>> => {
+  authenticateStore.updateErrors([]);
 
-    const updateModel: UpdateUserModel = {
-        _id: formData.get("id") as string,
-        email: formData.get("email") as string,
-        username: formData.get("username") as string,
-        lastName: formData.get("lastName") as string,
-        firstName: formData.get("firstName") as string
-    }
+  const updateModel: UpdateUserModel = {
+    _id: formData.get("id") as string,
+    email: formData.get("email") as string,
+    username: formData.get("username") as string,
+    lastName: formData.get("lastName") as string,
+    firstName: formData.get("firstName") as string,
+  };
 
-    // schema validation
-    const validatedFields = UpdateUserSchema.safeParse(updateModel);
-    if (!validatedFields.success) {
-        return {
-        status: "ERROR",
-        errors: zodErrorsToServerActionErrors(validatedFields.error.errors),
-        };
-    }
+  // schema validation
+  const validatedFields = UpdateUserSchema.safeParse(updateModel);
+  if (!validatedFields.success) {
+    return {
+      status: "ERROR",
+      errors: zodErrorsToServerActionErrors(validatedFields.error.errors),
+    };
+  }
 
-    const response = await UpdateUserAsync({...updateModel});
-  
-    if (response.status === "OK") {
-      showSuccess({
-        title: "Update User Informations",
-        description: "User successfully updated."
-      });
-      authenticateStore.updateOpened(false);
-      RevalidateCache({
-        page: "dashboard",
-      });
-    } else {
-        authenticateStore.updateErrors(response.errors.map((e) => e.message));
-    }
-    return response;
+  const response = await UpdateUserAsync({ ...updateModel });
+
+  if (response.status === "OK") {
+    showSuccess({
+      title: "Update User Informations",
+      description: "User successfully updated.",
+    });
+    authenticateStore.updateOpened(false);
+    RevalidateCache({
+      page: "dashboard",
+    });
+  } else {
+    authenticateStore.updateErrors(response.errors.map((e) => e.message));
+  }
+  return response;
 };
 
 export const ResetUserPassword = async (
@@ -171,15 +188,18 @@ export const ResetUserPassword = async (
 ): Promise<ServerActionResponse<UserModel>> => {
   authenticateStore.updateErrors([]);
 
-  const resetPasswordModel : ResetPasswordModel = {
+  const resetPasswordModel: ResetPasswordModel = {
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
-  }
+  };
 
   // schema validation
-  const validatedFields = validateSchema(resetPasswordModel, ResetPasswordSchema);
-  if(validatedFields.status === "ERROR"){
-    return validatedFields
+  const validatedFields = validateSchema(
+    resetPasswordModel,
+    ResetPasswordSchema
+  );
+  if (validatedFields.status === "ERROR") {
+    return validatedFields;
   }
 
   const response = await ResetPasswordAsync({
@@ -191,14 +211,14 @@ export const ResetUserPassword = async (
   if (response.status === "OK") {
     showSuccess({
       title: "Reset User Password",
-      description: "Password successfully updated."
+      description: "Password successfully updated.",
     });
     authenticateStore.updatePasswordChange(false);
     RevalidateCache({
       page: "dashboard",
     });
   } else {
-      authenticateStore.updateErrors(response.errors.map((e) => e.message));
+    authenticateStore.updateErrors(response.errors.map((e) => e.message));
   }
   return response;
 };
@@ -207,42 +227,46 @@ export const ChangeUserPassword = async (
   previous: any,
   formData: FormData
 ): Promise<ServerActionResponse<UserModel>> => {
-
-  const changePasswordModel : ChangePasswordModel = {
+  const changePasswordModel: ChangePasswordModel = {
     userId: formData.get("userId") as string,
     oldPassword: formData.get("oldPassword") as string,
     password: formData.get("newPassword") as string,
     confirmPassword: formData.get("confirmPassword") as string,
-  }
+  };
 
   // schema validation
-  const validatedFields = validateSchema(changePasswordModel, ResetPasswordSchema);
-  if(validatedFields.status === "ERROR"){
-    return validatedFields
+  const validatedFields = validateSchema(
+    changePasswordModel,
+    ResetPasswordSchema
+  );
+  if (validatedFields.status === "ERROR") {
+    return validatedFields;
   }
 
   const response = await ChangePasswordAsync({
-    ...changePasswordModel
+    ...changePasswordModel,
   });
   if (response.status === "OK") {
     showSuccess({
       title: "Reset User Password",
-      description: "Password successfully updated."
+      description: "Password successfully updated.",
     });
     signIn("credentials", {
-      email: response.response.email, 
-      password: changePasswordModel.password
+      email: response.response.email,
+      password: changePasswordModel.password,
     });
   } else {
-      authenticateStore.updateErrors(response.errors.map((e) => e.message));
+    authenticateStore.updateErrors(response.errors.map((e) => e.message));
   }
   return response;
-
-}
+};
 
 export const validateSchema = (
-  model: RegisterUserModel | ChangePasswordModel | ResetPasswordModel, 
-  schema: typeof RegisterUserSchema | typeof ChangePasswordSchema | typeof ResetPasswordSchema
+  model: RegisterUserModel | ChangePasswordModel | ResetPasswordModel,
+  schema:
+    | typeof RegisterUserSchema
+    | typeof ChangePasswordSchema
+    | typeof ResetPasswordSchema
 ): ServerActionResponse => {
   const validatedFields = schema.safeParse(model);
   if (!validatedFields.success) {
@@ -258,13 +282,16 @@ export const validateSchema = (
     return {
       status: "ERROR",
       errors: [
-          {message: "Password must be at least 7 characters long, contain an uppercase letter, a number, and a special character."}
-      ]
-    }
+        {
+          message:
+            "Password must be at least 7 characters long, contain an uppercase letter, a number, and a special character.",
+        },
+      ],
+    };
   }
 
   return {
-      status: "OK",
-      response: model,
+    status: "OK",
+    response: model,
   };
 };
