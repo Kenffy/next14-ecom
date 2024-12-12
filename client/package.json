@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "seed": "tsx scripts/seed.ts",
     "lint": "next lint"
   },
   "dependencies": {
@@ -42,6 +43,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.7",
     "embla-carousel-react": "^8.5.1",
     "input-otp": "^1.4.1",
     "lucide-react": "^0.468.0",
@@ -59,11 +61,13 @@
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.19.2",
     "uuid": "^11.0.3",
     "vaul": "^1.1.1",
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
