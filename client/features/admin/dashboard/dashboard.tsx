@@ -1,7 +1,6 @@
 "use client"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+
+import { SidebarInset } from "@/components/ui/sidebar";
 import { CategoryModel, ProductModel, UserModel } from "@/schemas/models";
 import { FC, useEffect } from "react";
 import { adminStore } from "../admin-store";

@@ -1,4 +1,4 @@
-//import Navbar from "@/components/nav-bar/nav-bar";
+import Navbar from "@/components/nav-bar/nav-bar";
 import { AuthenticatedProviders } from "@/features/globals/providers";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ export default function RootLayout({
     return (
         <AuthenticatedProviders>
             <div className={cn("flex flex-1 items-stretch min-h-screen")}>
-                {/* <Navbar /> */}
+                <Navbar />
                 <div className="flex-1 flex">{children}</div>
             </div>
         </AuthenticatedProviders>
