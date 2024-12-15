@@ -6,8 +6,9 @@ import mongoDbConnection from "@/features/common/services/mongo";
 import { getCurrentUser } from "./helpers";
 import bcrypt from "bcryptjs";
 import { RevalidateCache } from "../common/navigation-helpers";
-import { User, UserModel } from "@/schemas/models";
+import { UserModel } from "@/schemas/models";
 import { ChangePasswordModel } from "../common/models";
+import { User } from "@/schemas/user";
 
 const LOCKOUT_DURATION = 5 // in min
 const MAX_FAILED_LOGIN = 3

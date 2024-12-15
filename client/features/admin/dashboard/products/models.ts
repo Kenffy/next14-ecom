@@ -1,21 +1,45 @@
 import * as z from "zod";
 
+// Define the possible inventory statuses
+const InventoryStatusEnum = z.enum([
+  "in_stock",
+  "out_of_stock",
+  "low_stock",
+  "backorder",
+  "pre_order",
+  "discontinued",
+  "reserved",
+  "coming_soon",
+  "on_hold",
+]);
+
+// Define the ProductType enum (assuming possible types)
+const ProductTypeEnum = z.enum(["simple", "variable"]);
+
+// Define the Inventory schema
+const InventorySchema = z.object({
+  quantity: z.number().nonnegative({ message: "Quantity must be a non-negative number" }),
+  status: InventoryStatusEnum,
+});
+
 export const ProductSchema = z.object({
+  sku: z.string().min(1, {
+    message: "SKU is Required",
+  }),
   name: z.string().min(1, {
     message: "Product name is Required",
   }),
-  desc: z.string().min(1, {
+  description: z.string().min(1, {
     message: "Product description is Required",
-  }),
-  category: z.string().min(1, {
-    message: "Category is Required",
   }),
   price: z.number().min(1, {
     message: "Price is Required",
   }),
-  discount: z.number(),
-  quantity: z.number(),
-  personalisable: z.boolean(),
+  type: ProductTypeEnum,
+  inventory: InventorySchema.optional(),
+  brand: z.string().optional(),
+  discount: z.number().optional(),
+  personalisable: z.boolean().optional(),
 });
 
 export const ProductVariantSchema = z.object({

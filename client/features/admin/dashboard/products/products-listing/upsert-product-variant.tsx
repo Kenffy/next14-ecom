@@ -14,15 +14,12 @@ import { Button } from "@/components/ui/button";
 import { LoadingIndicator } from "@/components/ui/loading";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ProductVariantModel } from "@/schemas/models";
 import {
   AddOrUpdateProductVariant,
   adminProductListingStore,
   useAdminProductListingState,
 } from "./products-listing-store";
 import { ProductImagesInput } from "./products-images-input";
-import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface UpsertProductVariantProps { }
@@ -68,16 +65,16 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
                 </>
               )}
               <div className="grid gap-2">
-                <Label>Color</Label>
+                <Label>SKU</Label>
                 <Input
                   type="text"
                   required
-                  name="color"
-                  placeholder="Color"
-                  defaultValue={productVariant.color}
+                  name="sku"
+                  placeholder="SKU"
+                  defaultValue={productVariant.sku}
                 />
               </div>
-              <div className="grid gap-2">
+              {/* <div className="grid gap-2">
                 <Label>Size</Label>
                 <Input
                   type="text"
@@ -86,7 +83,7 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
                   placeholder="Size"
                   defaultValue={productVariant.size}
                 />
-              </div>
+              </div> */}
               <div className="flex items-center gap-2">
                 <div className="flex-1 gap-2">
                   <Label>Quantity</Label>
@@ -96,9 +93,9 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
                     name="quantity"
                     placeholder="Quantity"
                     defaultValue={
-                      productVariant.quantity !== 0
-                        ? productVariant.quantity
-                        : product?.quantity
+                      productVariant.inventory.quantity !== 0
+                        ? productVariant.inventory.quantity
+                        : product?.inventory?.quantity
                     }
                   />
                 </div>
@@ -127,7 +124,7 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
                   />
                 </div>
               </div>
-              <div className="grid gap-2">
+              {/* <div className="grid gap-2">
                 <Label>Short Description</Label>
                 <Textarea
                   required
@@ -137,10 +134,10 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
                   rows={3}
                   defaultValue={productVariant.desc}
                 />
-              </div>
+              </div> */}
               <div className="grid gap-2">
                 <Label>Product Images</Label>
-                <ProductImagesInput />
+                <ProductImagesInput onImagesChange={(formData, size) => adminProductListingStore.updateUploads(formData, size)}/>
               </div>
             </div>
             <DialogFooter className="flex items-center justify-end">

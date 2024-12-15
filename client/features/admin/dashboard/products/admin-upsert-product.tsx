@@ -1,7 +1,6 @@
 import { FC, useState } from "react";
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import { useFormState, useFormStatus } from "react-dom";
-// import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +11,9 @@ import { AddOrUpdateProduct, adminProductStore, useAdminProductState } from "./a
 import { Hero } from "@/components/ui/hero";
 import { PackagePlus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { ProductImagesInput } from "./products-listing/products-images-input";
+import { AddAttribute } from "./admin-add-attribute";
 
 
 interface UpsertProductProps { }
@@ -19,15 +21,26 @@ interface UpsertProductProps { }
 export const UpsertProduct: FC<UpsertProductProps> = (props) => {
   const initialState: ServerActionResponse | undefined = undefined;
 
-  const { product } = useAdminProductState();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  const { product, categories, productType } = useAdminProductState();
+
+  const categoryOptions = categories.filter(c =>c.name.toLocaleLowerCase() !== "all").map(c => {
+    return {
+      value: c._id as string, 
+      label: c.name as string
+    }
+  });
 
   const [formState, formAction] = useFormState(AddOrUpdateProduct, initialState);
 
-  const [colors, setColors] = useState<string[]>([]);
-  const [sizes, setSizes] = useState<string[]>([]);
-
   const handleCancel = () => {
     adminProductStore.cancelAddOrEditProduct();
+  }
+
+  const handleCategoriesChange = (items: Array<string>) => {
+    setSelectedCategories(items);
+    adminProductStore.updateProductCategories(items);
   }
 
   return (
@@ -56,7 +69,18 @@ export const UpsertProduct: FC<UpsertProductProps> = (props) => {
               </>
             )}
             <div className="flex-1 gap-2">
-              <Label>Name</Label>
+              <Label>SKU*</Label>
+              <Input
+                type="text"
+                required
+                name="sku"
+                placeholder="SKU"
+                defaultValue={product.sku}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+            <div className="flex-1 gap-2">
+              <Label>Name*</Label>
               <Input
                 type="text"
                 required
@@ -65,19 +89,29 @@ export const UpsertProduct: FC<UpsertProductProps> = (props) => {
                 defaultValue={product.name}
               />
             </div>
+              <div className="flex-1 gap-2">
+                <Label>Brand</Label>
+                <Input
+                  type="text"
+                  name="brand"
+                  placeholder="Brand"
+                  defaultValue={product.brand}
+                />
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               <div className="flex-1 gap-2">
-                <Label>Quantity</Label>
+                <Label>Quantity*</Label>
                 <Input
                   type="number"
                   required
                   name="quantity"
                   placeholder="Quantity"
-                  defaultValue={product.quantity}
+                  defaultValue={product.inventory?.quantity}
                 />
               </div>
               <div className="flex-1 gap-2">
-                <Label>Price</Label>
+                <Label>Price*</Label>
                 <Input
                   type="number"
                   required
@@ -97,34 +131,28 @@ export const UpsertProduct: FC<UpsertProductProps> = (props) => {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label>Description</Label>
+              <Label>Description*</Label>
               <Textarea
                 required
                 name="desc"
                 placeholder="Description"
-                defaultValue={product.desc}
+                defaultValue={product.description}
               />
             </div>
-            {/* <div className="grid gap-2">
-              <Label>Sizes</Label>
-              <ItemsInput
-                value={sizes}
-                onChange={setSizes}
-                placeholder="Enter values, comma separated..."
-              />
-            </div>
+
+            {categoryOptions.length > 0 &&
             <div className="grid gap-2">
-              <Label>Colors</Label>
-              <ItemsInput
-                value={colors}
-                onChange={setColors}
-                placeholder="Enter values, comma separated..."
+              <Label>Categories*</Label>
+              <MultiSelect
+                options={categoryOptions}
+                onValueChange={(items)=>handleCategoriesChange(items)}
+                defaultValue={selectedCategories}
+                placeholder="Select categories"
+                variant="default"
+                animation={0}
+                maxCount={5}
               />
-            </div> */}
-            <div className="grid gap-2">
-              <Label>Category</Label>
-              <CategorySelect />
-            </div>
+            </div>}
 
             <div className="flex items-center gap-2">
               <div className="flex-1 gap-2">
@@ -178,11 +206,27 @@ export const UpsertProduct: FC<UpsertProductProps> = (props) => {
             </div>
 
             <div className="grid gap-2">
+              <Label>Product Type*</Label>
+              <small>Selecting "Variable" allows you to create variants of this product.</small>
+              <ProductTypeSelect />
+            </div>
+
+            {productType === "variable" && 
+            <div className="grid gap-2">
+              <AddAttribute />
+            </div>
+            }
+
+            <div className="grid gap-2">
               <div className="flex items-center space-x-2 gap-2">
                 <Switch name="personalisable" id="personalisable" defaultChecked={product.personalisable} />
                 <Label htmlFor="personalisable">Personalisable</Label>
               </div>
             </div>
+            <div className="grid gap-2">
+                <Label>Product Images</Label>
+                <ProductImagesInput onImagesChange={(formData, size) => adminProductStore.updateUploads(formData, size)}/>
+              </div>
             <div className="flex items-center justify-end gap-4">
               <Button type="button"
                 onClick={handleCancel}
@@ -207,17 +251,16 @@ function Submit() {
   );
 }
 
-function CategorySelect() {
-  const { category } = useAdminProductState();
+function ProductTypeSelect() {
+  const { productType } = useAdminProductState();
   return (
-    <Select onValueChange={(value) => adminProductStore.updateCategory(value)} value={category}>
-      <SelectTrigger className="">
-        <SelectValue placeholder={category} defaultValue={category} />
+    <Select onValueChange={(value) => adminProductStore.updateProductType(value)} value={productType}>
+      <SelectTrigger>
+        <SelectValue placeholder={productType} defaultValue={productType} />
       </SelectTrigger>
       <SelectContent>
-        {adminProductStore.categories.map((category, index) => (
-          <SelectItem key={index} value={category.name}>{category.name}</SelectItem>
-        ))}
+          <SelectItem value="simple">Simple</SelectItem>
+          <SelectItem value="variable">Variable</SelectItem>
       </SelectContent>
     </Select>
   )

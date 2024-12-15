@@ -1,8 +1,7 @@
-import { DisplayError } from '@/components/ui/error/display-error';
-import { GetCategoriesAsync } from '@/features/admin/dashboard/categories/category-service';
-import { GetAllProductsAsync } from '@/features/admin/dashboard/products/product-service';
-import { GetAllUsersAsync } from '@/features/auth-page/auth-service';
-import { HomePage } from '@/features/home/home-page';
+import { DisplayError } from "@/components/ui/error/display-error";
+import { GetCategoriesAsync } from "@/features/admin/dashboard/categories/category-service";
+import { GetAllProductsAsync, GetBaseProductsAsync } from "@/features/admin/dashboard/products/product-service";
+import { HomePage } from "@/features/home/home-page";
 
 export const metadata = {
   title: "TemosCo Home",
@@ -10,12 +9,10 @@ export const metadata = {
 };
 
 export default async function Home() {
-
   const [productResponse, categoryResponse] = await Promise.all([
-    GetAllProductsAsync(),
+    GetBaseProductsAsync(),
     GetCategoriesAsync(),
   ]);
-
 
   if (productResponse.status !== "OK") {
     return <DisplayError errors={productResponse.errors} />;
@@ -24,10 +21,13 @@ export default async function Home() {
   if (categoryResponse.status !== "OK") {
     return <DisplayError errors={categoryResponse.errors} />;
   }
+  console.log(productResponse)
   return (
     <main className="flex min-h-screen">
-      <HomePage products={productResponse.response}
-        categories={categoryResponse.response} />
+      <HomePage
+        products={[...productResponse.response]}
+        categories={categoryResponse.response}
+      />
     </main>
-  )
+  );
 }

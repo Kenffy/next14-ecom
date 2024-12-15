@@ -1,11 +1,7 @@
 "use client"
 
 import { FC } from "react";
-import { useHomeState } from "./home-store";
 import Link from "next/link";
-import ProductCard from "@/components/product/ProductCard";
-import { Button } from "@/components/ui/button";
-import { ProductModel } from "@/schemas/models";
 import { Reviews } from "@/data/data";
 import ReviewCard from "@/components/product/ReviewCard";
 

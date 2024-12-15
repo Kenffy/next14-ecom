@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,10 +12,10 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -24,8 +24,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -33,14 +33,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { LoadingIndicator } from "@/components/ui/loading"
-import { format } from "date-fns"
-import { ProductModel } from "@/schemas/models"
-import { adminProductStore, useAdminProductState } from "./admin-products-store"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { UpdateProductSettings } from "./product-service"
+} from "@/components/ui/table";
+import { LoadingIndicator } from "@/components/ui/loading";
+import { format } from "date-fns";
+import { ProductModel } from "@/schemas/models";
+import {
+  adminProductStore,
+  useAdminProductState,
+} from "./admin-products-store";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { UpdateProductSettings } from "./product-service";
 
 interface ProductTableProps {
   products: ProductModel[];
@@ -51,8 +54,12 @@ export const columns: ColumnDef<ProductModel>[] = [
     id: "images",
     enableHiding: false,
     cell: ({ row }) => {
-      const product = row.original
-      const productImageUrl: string = product.defaultImage ? product.defaultImage : "/images/products/product-default.png";
+      const product = row.original;
+      const productImageUrl: string = product.defaultImage
+        ? product.defaultImage
+        : product.images && product.images?.length > 0
+        ? product.images[0].url
+        : "/images/products/product-default.png";
 
       return (
         <div className="h-20 w-20">
@@ -64,7 +71,7 @@ export const columns: ColumnDef<ProductModel>[] = [
             alt={product.name}
           />
         </div>
-      )
+      );
     },
   },
   {
@@ -78,9 +85,13 @@ export const columns: ColumnDef<ProductModel>[] = [
           Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
-    cell: ({ row }) => <div className="lowercase break-all line-clamp-2">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase break-all line-clamp-2">
+        {row.getValue("name")}
+      </div>
+    ),
   },
   {
     accessorKey: "category",
@@ -100,9 +111,13 @@ export const columns: ColumnDef<ProductModel>[] = [
           Created Date
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
-    cell: ({ row }) => <div className="lowercase">{format(row.getValue("createdAt"), "dd.MM.yyyy")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">
+        {format(row.getValue("createdAt"), "dd.MM.yyyy")}
+      </div>
+    ),
   },
   {
     accessorKey: "isDeleted",
@@ -115,14 +130,15 @@ export const columns: ColumnDef<ProductModel>[] = [
           Status
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => (
       <div className="capitalize">
-        {!row.getValue("isDeleted") ?
-          <span className=" text-green-400">active</span> :
+        {!row.getValue("isDeleted") ? (
+          <span className=" text-green-400">active</span>
+        ) : (
           <span className=" text-red-500">inactive</span>
-        }
+        )}
       </div>
     ),
   },
@@ -130,7 +146,7 @@ export const columns: ColumnDef<ProductModel>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const product = row.original
+      const product = row.original;
 
       const { isLoading, handleAction } = useDropdownAction({ product });
 
@@ -148,19 +164,23 @@ export const columns: ColumnDef<ProductModel>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={async () => await handleAction("details")}>
+            <DropdownMenuItem
+              onClick={async () => await handleAction("details")}
+            >
               Listing Product
             </DropdownMenuItem>
             <DropdownMenuItem onClick={async () => await handleAction("edit")}>
               Edit Product
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={async () => await handleAction("disable")}>
-              {product.isDeleted ? "Restore Product" : "Delete Product"}
+            <DropdownMenuItem
+              onClick={async () => await handleAction("disable")}
+            >
+              {product.deleted ? "Restore Product" : "Delete Product"}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
 ];
@@ -176,16 +196,20 @@ const useDropdownAction = (props: { product: ProductModel }) => {
     setIsLoading(true);
     switch (action) {
       case "disable":
-        const message = `Are you sure you want to ${product.isDeleted ? "Restore" : "Delete"} this product?`
+        const message = `Are you sure you want to ${
+          product.deleted ? "Restore" : "Delete"
+        } this product?`;
         if (window.confirm(message)) {
-          await UpdateProductSettings({ product: { ...product, isDeleted: !product.isDeleted } });
+          await UpdateProductSettings({
+            product: { ...product, deleted: !product.deleted },
+          });
         }
         break;
       case "edit":
         adminProductStore.updateProduct(product);
         break;
       case "details":
-        router.push(`/dashboard/products/${product.slug}`)
+        router.push(`/dashboard/products/${product.slug}`);
         break;
     }
     setIsLoading(false);
@@ -199,17 +223,17 @@ const useDropdownAction = (props: { product: ProductModel }) => {
 
 export function ProductsTable() {
   const { products } = useAdminProductState();
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
+  );
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 5,
   });
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data: products as Array<ProductModel>,
@@ -228,7 +252,7 @@ export function ProductsTable() {
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination
+      pagination,
     },
   });
 
@@ -265,7 +289,7 @@ export function ProductsTable() {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -281,11 +305,11 @@ export function ProductsTable() {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -344,5 +368,5 @@ export function ProductsTable() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -5,14 +5,20 @@ import { useHomeState } from "./home-store";
 import Link from "next/link";
 import ProductCard from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
-import { ProductModel } from "@/schemas/models";
+import { BaseProductModel } from "@/schemas/models";
 
 
 interface ShopSectionProps {
+    products: Array<BaseProductModel>
 }
 
 export const ShopSection: FC<ShopSectionProps> = (props) => {
-    const { products } = useHomeState();
+    const {products} = props;
+    //const { products } = useHomeState();
+
+    if(products.length == 0){
+        return <></>
+    }
 
     return (
         <section id="shop" className=" container max-w-5xl mx-auto flex items-center justify-center py-20">
@@ -30,7 +36,7 @@ export const ShopSection: FC<ShopSectionProps> = (props) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                     {products.map((product) => (
-                        <ProductCard key={product.slug} product={product as ProductModel} />
+                        <ProductCard key={product.slug} product={product as BaseProductModel} />
                     ))}
                 </div>
                 <div className=" flex justify-center mt-5">

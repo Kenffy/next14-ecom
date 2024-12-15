@@ -5,7 +5,7 @@ import {
   zodErrorsToServerActionErrors,
 } from "@/features/common/server-action-response";
 import { showError, showSuccess } from "@/features/globals/global-message-store";
-import { FileModel, ProductModel, ProductVariantModel } from "@/schemas/models";
+import { FileModel, ProductModel, VariantModel } from "@/schemas/models";
 import { proxy, useSnapshot } from "valtio";
 import {
   CreateProductVariantAsync,
@@ -25,34 +25,36 @@ class AdminProductListingState {
     errors: [],
   };
 
-  private defaultModel: ProductVariantModel = {
+  private defaultModel: VariantModel = {
     _id: "",
+    sku: "",
     productId: "",
-    color: "",
-    desc: "",
-    size: "",
+    attributes: [],
     images: [],
-    quantity: 0,
+    inventory: {
+      quantity: 1,
+      status: "low_stock"
+    },
     price: 0,
     discount: 0,
   };
 
   public errors: string[] = [];
   public product: ProductModel | undefined;
-  public productVariant: ProductVariantModel = { ...this.defaultModel };
+  public productVariant: VariantModel = { ...this.defaultModel };
   public uploads: FormData = new FormData();
   public uploadSize: number = 0;
 
   public isOpened: boolean = false;
 
-  public productVariants: Array<ProductVariantModel> = [];
+  public productVariants: Array<VariantModel> = [];
 
   public initAdminProductVariantSession({
     product,
     productVariants,
   }: {
     product: ProductModel;
-    productVariants: Array<ProductVariantModel>;
+    productVariants: Array<VariantModel>;
   }) {
     this.product = product;
     this.productVariant.productId = product._id as string;
@@ -70,7 +72,7 @@ class AdminProductListingState {
     this.isOpened = value;
   }
 
-  public updateProductVariant(productVariant: ProductVariantModel) {
+  public updateProductVariant(productVariant: VariantModel) {
     this.productVariant = {
       ...productVariant,
     };
@@ -120,7 +122,7 @@ export const useAdminProductListingState = () => {
 export const AddOrUpdateProductVariant = async (
   previous: any,
   formData: FormData
-): Promise<ServerActionResponse<ProductVariantModel>> => {
+): Promise<ServerActionResponse<VariantModel>> => {
   adminProductListingStore.updateErrors([]);
 
   const uploadFormData = adminProductListingStore.uploads;
@@ -182,24 +184,28 @@ export const AddOrUpdateProductVariant = async (
 
 export const FormDataToProductVariantModel = (
   formData: FormData
-): ProductVariantModel => {
+): VariantModel => {
   const price = parseFloat(formData.get("price") as string).toFixed(2);
   const discount = parseFloat(formData.get("discount") as string).toFixed(2);
+  const quantity = parseInt(formData.get("quantity") as string);
+  const status = "in_stock"; //getProductStatusByQuantity(quantity);
   return {
     _id: formData.get("id") as string,
-    color: formData.get("color") as string,
-    desc: formData.get("desc") as string,
-    size: formData.get("size") as string,
+    sku: formData.get("sku") as string,
+    attributes: [],
     price: parseFloat(price),
     discount: parseFloat(discount),
-    quantity: parseInt(formData.get("quantity") as string),
+    inventory: {
+      quantity,
+      status,
+    },
     productId: adminProductListingStore.product?._id as string,
     images: [],
   };
 };
 
 const validateProductVariantSchema = (
-  model: ProductVariantModel
+  model: VariantModel
 ): ServerActionResponse => {
   const validatedFields = ProductVariantSchema.safeParse(model);
   if (!validatedFields.success) {

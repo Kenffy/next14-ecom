@@ -8,10 +8,13 @@ import {
   useAdminProductListingState,
 } from "./products-listing-store";
 
-interface ProductImagesInputProps { }
+interface ProductImagesInputProps { 
+  onImagesChange: (formData: FormData, size: number) => void;
+}
 const MAX_UPLOAD_FILES = 5;
 
 export const ProductImagesInput: FC<ProductImagesInputProps> = (props) => {
+  const {onImagesChange} = props;
   const [images, setImages] = useState<File[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -45,7 +48,7 @@ export const ProductImagesInput: FC<ProductImagesInputProps> = (props) => {
     files.forEach((file, index) => {
       formData.append(`file_${index}`, file);
     });
-    adminProductListingStore.updateUploads(formData, files.length);
+    onImagesChange(formData, files.length);
   };
 
   return (

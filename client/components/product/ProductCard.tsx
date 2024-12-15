@@ -4,9 +4,9 @@ import Link from "next/link";
 import React from "react";
 import Rating from "../Rating";
 import { Card } from "../ui/card";
-import { ProductModel } from "@/schemas/models";
+import { BaseProductModel } from "@/schemas/models";
 
-export default function ProductCard({ product }: { product: ProductModel }) {
+export default function ProductCard({ product }: { product: BaseProductModel }) {
 
   const productImageUrl: string = product.defaultImage ? product.defaultImage : "/images/products/product-default.png";
   return (
@@ -24,7 +24,7 @@ export default function ProductCard({ product }: { product: ProductModel }) {
             {product.name}
           </h2>
           <div className=" py-1">
-            <Rating value={product.rating as number} />
+            <Rating value={product?.rating as number} />
           </div>
           <div className="flex items-center gap-2">
             <span className=" font-semibold">

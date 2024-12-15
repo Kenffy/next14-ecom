@@ -1,9 +1,9 @@
-import { CategoryModel, ProductModel, UserModel } from "@/schemas/models";
+import { CategoryModel, BaseProductModel } from "@/schemas/models";
 import { proxy, useSnapshot } from "valtio";
 
 
 class HomeState {
-  public products: Array<ProductModel> = [];
+  public products: Array<BaseProductModel> = [];
   public categories: Array<CategoryModel> = [];
 
 
@@ -11,7 +11,7 @@ class HomeState {
     products,
     categories,
   }: {
-    products: Array<ProductModel>;
+    products: Array<BaseProductModel>;
     categories: Array<CategoryModel>;
   }) {
     this.products = products;

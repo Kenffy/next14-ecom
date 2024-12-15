@@ -2,7 +2,6 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FC, useEffect } from "react";
-import { Hero, HeroButton } from "@/components/ui/hero";
 import { Package, PackagePlus } from "lucide-react";
 import { ProductsTable } from "./products-table";
 import { UpsertProduct } from "./admin-upsert-product";
@@ -16,14 +15,18 @@ interface AdminProductProps {
 }
 
 export const AdminProducts: FC<AdminProductProps> = (props) => {
+  const {products, categories} = props;
   const { isOpened } = useAdminProductState();
 
   useEffect(() => {
+    console.log("effect called...")
     adminProductStore.initAdminProductSession({
-      products: props.products,
-      categories: props.categories,
+      products: products,
+      categories: categories,
     });
-  }, [props.products, props.categories]);
+  }, [products, categories]);
+
+  console.log(products)
 
   return (
     <ScrollArea className="flex-1">

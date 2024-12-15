@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import { Category, Product, User } from "@/schemas/models";
 import { UsersData, CategoriesData } from "@/data/data";
+import { User } from "@/schemas/user";
+import { Category } from "@/schemas/category";
 
 dotenv.config();
 

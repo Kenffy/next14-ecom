@@ -2,9 +2,10 @@
 import "server-only";
 
 import { ServerActionResponse } from "@/features/common/server-action-response";
-import { Category, CategoryModel } from "@/schemas/models";
+import { CategoryModel } from "@/schemas/models";
 import mongoDbConnection from "@/features/common/services/mongo";
 import { getCurrentUser } from "@/features/auth-page/helpers";
+import { Category } from "@/schemas/category";
 
 export const CreateCategoryAsync = async (
   model: CategoryModel

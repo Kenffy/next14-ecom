@@ -3,17 +3,18 @@ import "server-only";
 
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import mongoDbConnection from "@/features/common/services/mongo";
-import { Product, ProductModel, UploadResponse } from "@/schemas/models";
+import { BaseProductModel, ProductModel, UploadResponse } from "@/schemas/models";
 import { GenerateSlug } from "@/features/common/util";
 import { getCurrentUser } from "@/features/auth-page/helpers";
 import { RevalidateCache } from "@/features/common/navigation-helpers";
+import { Product } from "@/schemas/product";
 
 const CLOUDIFY_API_URL = process.env.CLOUDIFY_API_URL;
 const CLOUDIFY_API_KEY = process.env.CLOUDIFY_API_KEY;
 
 type ProductFilterProps = {
-  isDeleted?: boolean;
-  category?: string;
+  deleted?: boolean;
+  categories?: string[];
 };
 
 export const CreateProductAsync = async (
@@ -59,7 +60,7 @@ export const GetAllActiveProductsAsync = async (): Promise<
 > => {
   try {
     await mongoDbConnection();
-    const resources = await Product.find({ isDeleted: false });
+    const resources = await Product.find({ deleted: false });
     const recordProducts = resources.map<ProductModel>((prod) => {
       const { updatedAt, ...product } = prod._doc;
       return { ...product, _id: product._id.toString() };
@@ -83,8 +84,32 @@ export const GetAllProductsAsync = async (
     await mongoDbConnection();
     const resources = await Product.find({ ...filters });
     const recordProducts = resources.map<ProductModel>((prod) => {
-      const { updatedAt, password, ...product } = prod._doc;
+      const { updatedAt, ...product } = prod._doc;
       return { ...product, _id: product._id.toString() };
+    });
+    return {
+      status: "OK",
+      response: recordProducts,
+    };
+  } catch (error) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${error}` }],
+    };
+  }
+};
+
+export const GetBaseProductsAsync = async (
+  filters?: ProductFilterProps
+): Promise<ServerActionResponse<Array<BaseProductModel>>> => {
+  try {
+    await mongoDbConnection();
+    const attributes = "slug name price discount reviews defaultImage"
+    const resources = await Product.find({ ...filters }, attributes).exec();
+    
+    const recordProducts = resources.map<BaseProductModel>((prod) => {
+      const { _id, ...product } = prod._doc;
+      return product;
     });
     return {
       status: "OK",
@@ -386,7 +411,7 @@ export const UploadFileAsync = async (
       response: {
         message: uploadData.message,
         data: {
-          fileName: uploadData.fileName,
+          name: uploadData.fileName,
           location: uploadData.location,
           url: uploadData.url,
         },

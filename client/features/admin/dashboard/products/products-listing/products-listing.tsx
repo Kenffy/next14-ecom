@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FC, useEffect } from "react";
 import { Hero, HeroButton } from "@/components/ui/hero";
 import { Package, PackagePlus } from "lucide-react";
-import { FileModel, ProductModel, ProductVariantModel } from "@/schemas/models";
+import { FileModel, ProductModel, VariantModel } from "@/schemas/models";
 import { adminProductListingStore } from "./products-listing-store";
 import { UpsertProductVariant } from "./upsert-product-variant";
 import { ProductListingTable } from "./products-listing-table";
@@ -15,7 +15,7 @@ import { CustomHero } from "@/components/CustomHero";
 
 interface AdminProductListingProps {
     product: ProductModel;
-    productVariants: Array<ProductVariantModel>;
+    productVariants: Array<VariantModel>;
 }
 
 export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
@@ -32,7 +32,7 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
     let totalOfItems = 0
     productVariants.forEach(variant => {
         productImages.push(...variant.images!);
-        totalOfItems += variant.quantity;
+        totalOfItems += variant.inventory.quantity;
     });
 
     const productImageUrl = product && product.defaultImage ? product.defaultImage : "/images/products/product-default.png";
@@ -62,7 +62,7 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
                             <div className="flex flex-col gap-2">
                                 <div className="w-full flex items-center gap-2">
                                     <span className="font-semibold">Description:</span>
-                                    <p>{product.desc}</p>
+                                    <p>{product.description}</p>
                                 </div>
                                 {product?.brand && <div className="w-full flex items-center gap-2">
                                     <span className="font-semibold">Brand:</span>
@@ -70,7 +70,7 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
                                 </div>}
                                 <div className="w-full flex items-center gap-2">
                                     <span className="font-semibold">Category:</span>
-                                    <p>{product.category}</p>
+                                    <p>{product.categories.join(", ")}</p>
                                 </div>
                                 <div className="w-full flex items-center gap-2">
                                     <span className="font-semibold">Default Price:</span>
@@ -79,6 +79,10 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
                                 <div className="w-full flex items-center gap-2">
                                     <span className="font-semibold">Total of items:</span>
                                     <p>{totalOfItems}</p>
+                                </div>
+                                <div className="w-full flex items-center gap-2">
+                                    <span className="font-semibold">Stock Status:</span>
+                                    <p>{product.inventory?.status}</p>
                                 </div>
                                 {product.dimensions &&
                                     <div className="w-full flex items-center gap-2">

@@ -12,7 +12,7 @@ export const metadata = {
 export default async function AdminProductsPage() {
 
     const [productResponse, categoryResponse] = await Promise.all([
-        GetAllProductsAsync({ isDeleted: false }),
+        GetAllProductsAsync({ deleted: false }),
         GetCategoriesAsync(),
     ]);
 
@@ -23,6 +23,8 @@ export default async function AdminProductsPage() {
     if (categoryResponse.status !== "OK") {
         return <DisplayError errors={categoryResponse.errors} />;
     }
+
+    console.log("Products: ", productResponse.response)
 
     return (
         <AdminProducts

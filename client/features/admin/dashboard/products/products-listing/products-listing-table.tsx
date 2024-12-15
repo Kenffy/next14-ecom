@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/table";
 import { LoadingIndicator } from "@/components/ui/loading";
 import { format } from "date-fns";
-import { FileModel, ProductModel, ProductVariantModel } from "@/schemas/models";
+import { FileModel, ProductModel, VariantModel } from "@/schemas/models";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -49,12 +49,12 @@ interface AdminProductListingTableProps {
   products: ProductModel[];
 }
 
-export const columns: ColumnDef<ProductVariantModel>[] = [
+export const columns: ColumnDef<VariantModel>[] = [
   {
     id: "images",
     enableHiding: false,
     cell: ({ row }) => {
-      const product = row.original as ProductVariantModel;
+      const product = row.original as VariantModel;
       let productImageUrl: string = "/images/products/product-default.png";
       if (product && product.images?.length! > 0) {
         const images = product.images as FileModel[];
@@ -68,7 +68,7 @@ export const columns: ColumnDef<ProductVariantModel>[] = [
             height={50}
             width={50}
             src={productImageUrl}
-            alt={product.color}
+            alt={"variant image"}
           />
         </div>
       );
@@ -187,7 +187,7 @@ export const columns: ColumnDef<ProductVariantModel>[] = [
             <DropdownMenuItem
               onClick={async () => await handleAction("disable")}
             >
-              {productVariant.isDeleted
+              {productVariant.deleted
                 ? "Restore Product Variant"
                 : "Delete Product Variant"}
             </DropdownMenuItem>
@@ -201,7 +201,7 @@ export const columns: ColumnDef<ProductVariantModel>[] = [
 
 type DropdownAction = "edit" | "disable";
 
-const useDropdownAction = (props: { productVariant: ProductVariantModel }) => {
+const useDropdownAction = (props: { productVariant: VariantModel }) => {
   const { productVariant } = props;
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -209,13 +209,13 @@ const useDropdownAction = (props: { productVariant: ProductVariantModel }) => {
     setIsLoading(true);
     switch (action) {
       case "disable":
-        const message = `Are you sure you want to ${productVariant.isDeleted ? "Restore" : "Delete"
+        const message = `Are you sure you want to ${productVariant.deleted ? "Restore" : "Delete"
           } this product?`;
         if (window.confirm(message)) {
           await UpdateProductVariantSettings({
             product: {
               ...productVariant,
-              isDeleted: !productVariant.isDeleted,
+              deleted: !productVariant.deleted,
             },
           });
         }
@@ -248,7 +248,7 @@ export function ProductListingTable() {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: productVariants as Array<ProductVariantModel>,
+    data: productVariants as Array<VariantModel>,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
