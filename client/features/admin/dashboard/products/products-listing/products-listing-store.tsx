@@ -5,7 +5,7 @@ import {
   zodErrorsToServerActionErrors,
 } from "@/features/common/server-action-response";
 import { showError, showSuccess } from "@/features/globals/global-message-store";
-import { FileModel, ProductModel, VariantModel } from "@/schemas/models";
+import { CategoryModel, FileModel, ProductModel, VariantModel } from "@/schemas/models";
 import { proxy, useSnapshot } from "valtio";
 import {
   CreateProductVariantAsync,
@@ -48,17 +48,21 @@ class AdminProductListingState {
   public isOpened: boolean = false;
 
   public productVariants: Array<VariantModel> = [];
+  public categories: Array<CategoryModel> = [];
 
   public initAdminProductVariantSession({
     product,
     productVariants,
+    categories
   }: {
     product: ProductModel;
     productVariants: Array<VariantModel>;
+    categories: Array<CategoryModel> ;
   }) {
     this.product = product;
     this.productVariant.productId = product._id as string;
     this.productVariants = productVariants;
+    this.categories = categories;
   }
 
   public addProductVariant() {

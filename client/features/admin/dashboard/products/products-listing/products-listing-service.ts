@@ -3,11 +3,12 @@ import "server-only";
 
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import mongoDbConnection from "@/features/common/services/mongo";
-import { ProductVariant, ProductVariantModel } from "@/schemas/models";
+import { VariantModel } from "@/schemas/models";
 import { getCurrentUser } from "@/features/auth-page/helpers";
 import { RevalidateCache } from "@/features/common/navigation-helpers";
 import { adminProductListingStore } from "./products-listing-store";
 import { GetProductBySlugAsync } from "../product-service";
+import { Variant } from "@/schemas/variant";
 
 type ProductVariantFilterProps = {
   isDeleted?: boolean;
@@ -15,8 +16,8 @@ type ProductVariantFilterProps = {
 };
 
 export const CreateProductVariantAsync = async (
-  model: ProductVariantModel
-): Promise<ServerActionResponse<ProductVariantModel>> => {
+  model: VariantModel
+): Promise<ServerActionResponse<VariantModel>> => {
   try {
     const response = await EnsureCreateOperationAsync();
     if (response.status !== "OK") {
@@ -25,7 +26,7 @@ export const CreateProductVariantAsync = async (
 
     await mongoDbConnection();
     const { _id, ...modelToSave } = model;
-    const productVariantModel = new ProductVariant({
+    const productVariantModel = new Variant({
       ...modelToSave,
       isDeleted: false,
     });
@@ -53,7 +54,7 @@ export const CreateProductVariantAsync = async (
 
 export const GetAllVariantsForCurrentProductAsync = async (
   slug: string
-): Promise<ServerActionResponse<Array<ProductVariantModel>>> => {
+): Promise<ServerActionResponse<Array<VariantModel>>> => {
   try {
     await mongoDbConnection();
     const productResponse = await GetProductBySlugAsync(slug);
@@ -61,11 +62,11 @@ export const GetAllVariantsForCurrentProductAsync = async (
       return productResponse;
     }
 
-    const resources = await ProductVariant.find({
+    const resources = await Variant.find({
       productId: productResponse.response._id,
       isDeleted: false,
     });
-    const recordProductVariants = resources.map<ProductVariantModel>((prod) => {
+    const recordProductVariants = resources.map<VariantModel>((prod) => {
       const { updatedAt, ...productVariant } = prod._doc;
       return { ...productVariant, _id: productVariant._id.toString() };
     });
@@ -83,11 +84,11 @@ export const GetAllVariantsForCurrentProductAsync = async (
 
 export const GetAllProductVariantsAsync = async (
   filters?: ProductVariantFilterProps
-): Promise<ServerActionResponse<Array<ProductVariantModel>>> => {
+): Promise<ServerActionResponse<Array<VariantModel>>> => {
   try {
     await mongoDbConnection();
-    const resources = await ProductVariant.find({ ...filters });
-    const recordProductVariants = resources.map<ProductVariantModel>((prod) => {
+    const resources = await Variant.find({ ...filters });
+    const recordProductVariants = resources.map<VariantModel>((prod) => {
       const { updatedAt, password, ...productVariant } = prod._doc;
       return { ...productVariant, _id: productVariant._id.toString() };
     });
@@ -104,8 +105,8 @@ export const GetAllProductVariantsAsync = async (
 };
 
 export const UpdateProductVariantAsync = async (
-  productVariantModel: ProductVariantModel
-): Promise<ServerActionResponse<ProductVariantModel>> => {
+  productVariantModel: VariantModel
+): Promise<ServerActionResponse<VariantModel>> => {
   try {
     if (productVariantModel._id!) {
       const response = await EnsureUpdateOperationAsync(
@@ -117,7 +118,7 @@ export const UpdateProductVariantAsync = async (
     }
 
     await mongoDbConnection();
-    const updatedProductVariant = await ProductVariant.findByIdAndUpdate(
+    const updatedProductVariant = await Variant.findByIdAndUpdate(
       productVariantModel._id,
       { $set: productVariantModel },
       { new: true }
@@ -145,7 +146,7 @@ export const UpdateProductVariantAsync = async (
 };
 
 export const DeleteProductVariantAsync = async (
-  productVariantModel: ProductVariantModel
+  productVariantModel: VariantModel
 ): Promise<ServerActionResponse<string>> => {
   try {
     if (productVariantModel._id) {
@@ -159,7 +160,7 @@ export const DeleteProductVariantAsync = async (
 
     await mongoDbConnection();
 
-    const updatedProductVaraint = await ProductVariant.findByIdAndUpdate(
+    const updatedProductVaraint = await Variant.findByIdAndUpdate(
       productVariantModel._id,
       { $set: { isDeleted: true } },
       { new: true }
@@ -188,10 +189,10 @@ export const DeleteProductVariantAsync = async (
 
 const GetProductVariantByIdAsync = async (
   productVariantId: string
-): Promise<ServerActionResponse<ProductVariantModel>> => {
+): Promise<ServerActionResponse<VariantModel>> => {
   try {
     await mongoDbConnection();
-    const resource = await ProductVariant.findById(productVariantId);
+    const resource = await Variant.findById(productVariantId);
 
     if (!resource) {
       return {
@@ -216,7 +217,7 @@ const GetProductVariantByIdAsync = async (
 
 export const EnsureUpdateOperationAsync = async (
   productId: string
-): Promise<ServerActionResponse<ProductVariantModel>> => {
+): Promise<ServerActionResponse<VariantModel>> => {
   const response = await GetProductVariantByIdAsync(productId);
   const currentUser = await getCurrentUser();
 
@@ -252,7 +253,7 @@ export const EnsureCreateOperationAsync = async (): Promise<
 };
 
 export const UpdateProductVariantSettings = async (props: {
-  product: ProductVariantModel;
+  product: VariantModel;
 }) => {
   await UpdateProductVariantAsync({ ...props.product });
 

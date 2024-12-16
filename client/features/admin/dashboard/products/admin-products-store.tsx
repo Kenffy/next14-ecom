@@ -47,6 +47,7 @@ class AdminProductState {
   public productCategories: Array<string> = [];
   public categories: Array<CategoryModel> = [];
   public attributes: Array<ProductAttribute> = [];
+  public uploadedImages: Array<FileModel> = [];
   public uploads: FormData = new FormData();
   public uploadSize: number = 0;
   public isOpened: boolean = false;
@@ -108,7 +109,8 @@ class AdminProductState {
     };
     this.productType = product.type;
     this.productCategories = product.categories;
-    this.attributes = product.attributes;
+    this.attributes = product?.attributes || [];
+    this.uploadedImages = product?.images || [];
     this.isOpened = true;
   }
 
@@ -163,7 +165,7 @@ export const useAdminProductState = () => {
 export const AddOrUpdateProduct = async (
   previous: any,
   formData: FormData
-): Promise<ServerActionResponse<ProductModel>> => {
+): Promise<ServerActionResponse<string>> => {
   adminProductStore.updateErrors([]);
 
   const uploadFormData = adminProductStore.uploads;

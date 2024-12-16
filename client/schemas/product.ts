@@ -23,7 +23,7 @@ const ProductSchema: Schema = new Schema<ProductModel>(
           name: String,
           location: String,
           url: String,
-        },
+        }
       ],
       default: [],
       maxlength: 5,
@@ -47,8 +47,8 @@ const ProductSchema: Schema = new Schema<ProductModel>(
       {
         id: String,
         name: String,
-        values: [String],
-      },
+        values: [String]
+      }
     ],
   },
   { timestamps: true }
@@ -56,7 +56,8 @@ const ProductSchema: Schema = new Schema<ProductModel>(
 
 ProductSchema.pre("validate", function (next) {
   if (this.name) {
-    this.slug = slugify(this.name, { lower: true, strict: true });
+    const name = this.name as string;
+    this.slug = slugify(name, { lower: true, strict: true });
   }
   next();
 });

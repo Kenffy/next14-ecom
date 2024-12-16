@@ -69,7 +69,7 @@ export interface ProductModel {
   images?: Array<FileModel>;
   categories: Array<string>;
   tags?: Array<string>;
-  attributes: Array<ProductAttribute>;
+  attributes?: Array<ProductAttribute>;
   deleted?: boolean;
   featured?: boolean;
   rating?: number;

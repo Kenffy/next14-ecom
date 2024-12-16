@@ -21,7 +21,7 @@ export default async function Home() {
   if (categoryResponse.status !== "OK") {
     return <DisplayError errors={categoryResponse.errors} />;
   }
-  console.log(productResponse)
+
   return (
     <main className="flex min-h-screen">
       <HomePage

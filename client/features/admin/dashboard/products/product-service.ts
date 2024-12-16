@@ -3,7 +3,13 @@ import "server-only";
 
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import mongoDbConnection from "@/features/common/services/mongo";
-import { BaseProductModel, ProductModel, UploadResponse } from "@/schemas/models";
+import {
+  BaseProductModel,
+  FileModel,
+  ProductAttribute,
+  ProductModel,
+  UploadResponse,
+} from "@/schemas/models";
 import { GenerateSlug } from "@/features/common/util";
 import { getCurrentUser } from "@/features/auth-page/helpers";
 import { RevalidateCache } from "@/features/common/navigation-helpers";
@@ -19,7 +25,7 @@ type ProductFilterProps = {
 
 export const CreateProductAsync = async (
   model: ProductModel
-): Promise<ServerActionResponse<ProductModel>> => {
+): Promise<ServerActionResponse<string>> => {
   try {
     const response = await EnsureCreateOperationAsync();
     if (response.status !== "OK") {
@@ -30,16 +36,14 @@ export const CreateProductAsync = async (
     const { _id, ...modelToSave } = model;
     const productModel = new Product({
       ...modelToSave,
-      slug: GenerateSlug(modelToSave.name),
-      isDeleted: false,
+      //slug: GenerateSlug(modelToSave.name),
     });
     const resource = await productModel.save();
-    const { updatedAt, ...product } = resource._doc;
 
-    if (product) {
+    if (resource && resource._doc) {
       return {
         status: "OK",
-        response: { ...product, _id: product._id.toString() },
+        response: "Product successfully added.",
       };
     }
 
@@ -83,10 +87,10 @@ export const GetAllProductsAsync = async (
   try {
     await mongoDbConnection();
     const resources = await Product.find({ ...filters });
-    const recordProducts = resources.map<ProductModel>((prod) => {
-      const { updatedAt, ...product } = prod._doc;
-      return { ...product, _id: product._id.toString() };
-    });
+    const recordProducts = resources.length > 0 ? resources.map((prod) => {
+      const product = performProductMapping(prod._doc as ProductModel);
+      return product;
+    }) : [];
     return {
       status: "OK",
       response: recordProducts,
@@ -99,14 +103,40 @@ export const GetAllProductsAsync = async (
   }
 };
 
+const performProductMapping = (product: ProductModel) => {
+  const { _id, updatedAt, ...others } = product;
+  const attributes: Array<ProductAttribute> =
+    others?.attributes && others.attributes.length > 0
+      ? others.attributes.map((a: any) => {
+          const { _id, ...rest } = a._doc;
+          return rest;
+        })
+      : [];
+  const images: Array<FileModel> =
+    others?.images && others.images.length > 0
+      ? others.images.map((a: any) => {
+          const { _id, ...rest } = a._doc;
+          return rest;
+        })
+      : [];
+
+  const mappedProduct: ProductModel = {
+    ...others,
+    attributes,
+    images,
+  };
+
+  return mappedProduct;
+};
+
 export const GetBaseProductsAsync = async (
   filters?: ProductFilterProps
 ): Promise<ServerActionResponse<Array<BaseProductModel>>> => {
   try {
     await mongoDbConnection();
-    const attributes = "slug name price discount reviews defaultImage"
+    const attributes = "slug name price discount reviews defaultImage";
     const resources = await Product.find({ ...filters }, attributes).exec();
-    
+
     const recordProducts = resources.map<BaseProductModel>((prod) => {
       const { _id, ...product } = prod._doc;
       return product;
@@ -125,7 +155,7 @@ export const GetBaseProductsAsync = async (
 
 export const UpdateProductAsync = async (
   productModel: ProductModel
-): Promise<ServerActionResponse<ProductModel>> => {
+): Promise<ServerActionResponse<string>> => {
   try {
     if (productModel._id!) {
       const response = await EnsureUpdateOperationAsync(productModel._id!);
@@ -142,12 +172,10 @@ export const UpdateProductAsync = async (
       { new: true }
     );
 
-    const { updatedAt, ...product } = updatedProduct._doc;
-
-    if (product) {
+    if (updatedProduct && updatedProduct._doc) {
       return {
         status: "OK",
-        response: { ...product, _id: product._id.toString() },
+        response: "Product successfully updated.",
       };
     }
 
@@ -257,11 +285,11 @@ export const GetProductBySlugAsync = async (
       };
     }
 
-    const { updatedAt, ...product } = resource._doc;
+    const product = performProductMapping(resource._doc as ProductModel);
 
     return {
       status: "OK",
-      response: { ...product, _id: product._id.toString() },
+      response: product,
     };
   } catch (error) {
     return {
@@ -285,11 +313,11 @@ const GetProductByIdAsync = async (
       };
     }
 
-    const { updatedAt, ...product } = resource._doc;
+    const product = performProductMapping(resource._doc as ProductModel);
 
     return {
       status: "OK",
-      response: { ...product, _id: product._id.toString() },
+      response: product
     };
   } catch (error) {
     return {

@@ -44,6 +44,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { UpdateProductSettings } from "./product-service";
+import { GetProductCategoryNamesByIds } from "@/features/common/util";
 
 interface ProductTableProps {
   products: ProductModel[];
@@ -65,8 +66,8 @@ export const columns: ColumnDef<ProductModel>[] = [
         <div className="h-20 w-20">
           <Image
             className="h-full w-full object-cover overflow-hidden rounded-sm"
-            height={50}
-            width={50}
+            height={60}
+            width={60}
             src={productImageUrl}
             alt={product.name}
           />
@@ -96,9 +97,13 @@ export const columns: ColumnDef<ProductModel>[] = [
   {
     accessorKey: "category",
     header: "Category",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("category")}</div>
-    ),
+    cell: ({ row }) => {
+      const categoryIds = row.original.categories;
+      const categories = GetProductCategoryNamesByIds(categoryIds, adminProductStore.categories);
+      return (
+        <div className="capitalize">{categories.join(", ")}</div>
+      )
+    },
   },
   {
     accessorKey: "createdAt",

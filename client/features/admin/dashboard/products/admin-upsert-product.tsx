@@ -134,6 +134,7 @@ export const UpsertProduct: FC<UpsertProductProps> = (props) => {
               <Label>Description*</Label>
               <Textarea
                 required
+                rows={4}
                 name="desc"
                 placeholder="Description"
                 defaultValue={product.description}
