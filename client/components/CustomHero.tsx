@@ -8,11 +8,11 @@ interface HeroProps extends PropsWithChildren {
     actionIcon: React.ReactNode;
     onClick: () => void;
     actionDescription: string;
-    disableAction?: boolean
+    //disableAction?: boolean
 }
 
 export const CustomHero: FC<HeroProps> = (props) => {
-    console.log(props.disableAction)
+    //console.log(props.disableAction)
     return (
         <div className="border-b w-full py-4">
             <div className="container max-w-5xl px-4 md:px-8 mx-auto">
@@ -24,7 +24,7 @@ export const CustomHero: FC<HeroProps> = (props) => {
                         <p className="text-muted-foreground max-w-xl text-sm">{props.description}</p>
                     </div>
                     <Button
-                        disabled={props?.disableAction}
+                        //disabled={props?.disableAction}
                         variant={"outline"}
                         className="flex flex-col gap-4 min-w-44 h-auto p-2 items-center text-start justify-start"
                         onClick={props.onClick}

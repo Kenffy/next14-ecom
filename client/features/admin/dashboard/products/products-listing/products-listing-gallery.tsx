@@ -17,7 +17,7 @@ export const AdminProductGallery: FC<AdminProductGalleryProps> = (props) => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                     {images.map((image, index) => (
                         <div key={index} className="h-[190px] max-w-[150px] border relative overflow-hidden rounded-sm bg-muted/50">
-                            <Image src={image.url} alt={image.fileName} height={100} width={100} className="h-full w-full object-cover" />
+                            <Image src={image.url} alt={image.name} height={100} width={100} className="h-full w-full object-cover" />
                             <div className='cursor-pointer absolute top-0 right-0 p-2 bg-muted/30 hover:bg-muted/50 rounded-bl-sm'>
                                 <ImageContextMenu image={image} />
                             </div>

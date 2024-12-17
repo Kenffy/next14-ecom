@@ -7,7 +7,7 @@ import { FC, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { FileModel } from "@/schemas/models";
 import { LoadingIndicator } from "@/components/ui/loading";
-import { adminProductListingStore } from "./products-listing-store";
+import { adminListingStore } from "./products-listing-store";
 
 interface Props {
     image: FileModel;
@@ -33,7 +33,7 @@ export const ImageContextMenu: FC<Props> = (props) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuItem className="flex gap-2"
-                        onClick={() => adminProductListingStore.setProductDefaultImage(props.image.url)}
+                        onClick={() => adminListingStore.setProductDefaultImage(props.image.url)}
                     >
                         <Image size={18} />
                         <span>As default Image</span>

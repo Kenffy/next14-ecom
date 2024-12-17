@@ -4,8 +4,8 @@ import { PlusIcon, SquareX } from "lucide-react";
 import Image from "next/image";
 import { FC, useRef, useState } from "react";
 import {
-  adminProductListingStore,
-  useAdminProductListingState,
+  adminListingStore,
+  useAdminListingState,
 } from "./products-listing-store";
 
 interface ProductImagesInputProps { 

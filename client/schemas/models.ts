@@ -30,11 +30,6 @@ export interface ProductAttribute {
   values: string[];
 }
 
-export interface VariantAttribute {
-  name: string;
-  value: string;
-}
-
 export interface Dimension {
   length: number;
   width: number;
@@ -80,6 +75,11 @@ export interface ProductModel {
   personalisation?: string;
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+export interface VariantAttribute {
+  name: string;
+  value: string;
 }
 
 export interface VariantModel {

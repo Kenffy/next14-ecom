@@ -125,7 +125,7 @@ export const columns: ColumnDef<ProductModel>[] = [
     ),
   },
   {
-    accessorKey: "isDeleted",
+    accessorKey: "deleted",
     header: ({ column }) => {
       return (
         <Button
@@ -139,7 +139,7 @@ export const columns: ColumnDef<ProductModel>[] = [
     },
     cell: ({ row }) => (
       <div className="capitalize">
-        {!row.getValue("isDeleted") ? (
+        {!row.getValue("deleted") ? (
           <span className=" text-green-400">active</span>
         ) : (
           <span className=" text-red-500">inactive</span>

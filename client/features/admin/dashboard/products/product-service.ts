@@ -104,7 +104,7 @@ export const GetAllProductsAsync = async (
 };
 
 const performProductMapping = (product: ProductModel) => {
-  const { _id, updatedAt, ...others } = product;
+  const { updatedAt, ...others } = product;
   const attributes: Array<ProductAttribute> =
     others?.attributes && others.attributes.length > 0
       ? others.attributes.map((a: any) => {
@@ -122,6 +122,7 @@ const performProductMapping = (product: ProductModel) => {
 
   const mappedProduct: ProductModel = {
     ...others,
+    _id: others._id?.toString(),
     attributes,
     images,
   };
@@ -194,7 +195,7 @@ export const UpdateProductAsync = async (
 export const UpdateProductDefaultImageAsync = async (
   productId: string,
   imageUrl: string
-): Promise<ServerActionResponse<ProductModel>> => {
+): Promise<ServerActionResponse<string>> => {
   try {
     const response = await EnsureUpdateOperationAsync(productId!);
     if (response.status !== "OK") {
@@ -210,12 +211,10 @@ export const UpdateProductDefaultImageAsync = async (
       { new: true }
     );
 
-    const { updatedAt, ...product } = updatedProduct._doc;
-
-    if (product) {
+    if (updatedProduct) {
       return {
         status: "OK",
-        response: { ...product, _id: product._id.toString() },
+        response: "Product default image updated.",
       };
     }
 
@@ -317,7 +316,7 @@ const GetProductByIdAsync = async (
 
     return {
       status: "OK",
-      response: product
+      response: product,
     };
   } catch (error) {
     return {

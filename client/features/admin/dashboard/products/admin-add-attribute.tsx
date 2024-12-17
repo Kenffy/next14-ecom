@@ -11,7 +11,6 @@ import { CustomInputTags } from "@/components/ui/custom-input-tags";
 
 export const AddAttribute = () => {
   const { attributes } = useAdminProductState();
-  console.log("attributes: ", attributes)
   return (
     <div className="flex gap-4 flex-col bg-foreground/[0.02] border p-4 rounded-md text-sm">
       <div className="flex items-center justify-between">

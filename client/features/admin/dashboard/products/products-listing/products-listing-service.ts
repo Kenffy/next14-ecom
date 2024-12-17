@@ -3,10 +3,10 @@ import "server-only";
 
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import mongoDbConnection from "@/features/common/services/mongo";
-import { VariantModel } from "@/schemas/models";
+import { FileModel, VariantAttribute, VariantModel } from "@/schemas/models";
 import { getCurrentUser } from "@/features/auth-page/helpers";
 import { RevalidateCache } from "@/features/common/navigation-helpers";
-import { adminProductListingStore } from "./products-listing-store";
+import { adminListingStore } from "./products-listing-store";
 import { GetProductBySlugAsync } from "../product-service";
 import { Variant } from "@/schemas/variant";
 
@@ -17,7 +17,7 @@ type ProductVariantFilterProps = {
 
 export const CreateProductVariantAsync = async (
   model: VariantModel
-): Promise<ServerActionResponse<VariantModel>> => {
+): Promise<ServerActionResponse<string>> => {
   try {
     const response = await EnsureCreateOperationAsync();
     if (response.status !== "OK") {
@@ -31,12 +31,11 @@ export const CreateProductVariantAsync = async (
       isDeleted: false,
     });
     const resource = await productVariantModel.save();
-    const { updatedAt, ...productVariant } = resource._doc;
 
-    if (productVariant) {
+    if (resource) {
       return {
         status: "OK",
-        response: { ...productVariant, _id: productVariant._id.toString() },
+        response: "Product variant successfully created.",
       };
     }
 
@@ -64,12 +63,14 @@ export const GetAllVariantsForCurrentProductAsync = async (
 
     const resources = await Variant.find({
       productId: productResponse.response._id,
-      isDeleted: false,
+      deleted: false,
     });
+
     const recordProductVariants = resources.map<VariantModel>((prod) => {
-      const { updatedAt, ...productVariant } = prod._doc;
-      return { ...productVariant, _id: productVariant._id.toString() };
+      const variant = performVariantMapping(prod._doc);
+      return variant;
     });
+
     return {
       status: "OK",
       response: recordProductVariants,
@@ -89,8 +90,8 @@ export const GetAllProductVariantsAsync = async (
     await mongoDbConnection();
     const resources = await Variant.find({ ...filters });
     const recordProductVariants = resources.map<VariantModel>((prod) => {
-      const { updatedAt, password, ...productVariant } = prod._doc;
-      return { ...productVariant, _id: productVariant._id.toString() };
+      const variant = performVariantMapping(prod._doc);
+      return variant;
     });
     return {
       status: "OK",
@@ -104,9 +105,36 @@ export const GetAllProductVariantsAsync = async (
   }
 };
 
+const performVariantMapping = (product: VariantModel) => {
+  const { updatedAt, ...others } = product;
+  const attributes: Array<VariantAttribute> =
+    others?.attributes && others.attributes.length > 0
+      ? others.attributes.map((a: any) => {
+          const { _id, ...rest } = a._doc;
+          return rest;
+        })
+      : [];
+  const images: Array<FileModel> =
+    others?.images && others.images.length > 0
+      ? others.images.map((a: any) => {
+          const { _id, ...rest } = a._doc;
+          return rest;
+        })
+      : [];
+
+  const mappedProduct: VariantModel = {
+    ...others,
+    _id: others._id?.toString(),
+    attributes,
+    images,
+  };
+
+  return mappedProduct;
+};
+
 export const UpdateProductVariantAsync = async (
   productVariantModel: VariantModel
-): Promise<ServerActionResponse<VariantModel>> => {
+): Promise<ServerActionResponse<string>> => {
   try {
     if (productVariantModel._id!) {
       const response = await EnsureUpdateOperationAsync(
@@ -124,12 +152,10 @@ export const UpdateProductVariantAsync = async (
       { new: true }
     );
 
-    const { updatedAt, ...productVariant } = updatedProductVariant._doc;
-
-    if (productVariant) {
+    if (updatedProductVariant) {
       return {
         status: "OK",
-        response: { ...productVariant, _id: productVariant._id.toString() },
+        response: "Product variant successfully updated.",
       };
     }
 
@@ -259,6 +285,6 @@ export const UpdateProductVariantSettings = async (props: {
 
   RevalidateCache({
     page: "dashboard",
-    params: `products/${adminProductListingStore.product?._id}`,
+    params: `products/${adminListingStore.product?._id}`,
   });
 };

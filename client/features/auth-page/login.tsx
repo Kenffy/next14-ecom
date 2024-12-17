@@ -35,7 +35,6 @@ export const LoginPage: FC<LoginProps> = (props) => {
         password: formData.get("password") as string,
         redirect: false
       });
-      console.log("login response: ", response)
       if (response?.error) {
         setError(response?.error!);
         setIsPending(false);

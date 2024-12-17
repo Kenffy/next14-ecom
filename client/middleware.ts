@@ -11,7 +11,6 @@ export async function middleware(request: NextRequest) {
   const res = NextResponse.next();
   const pathname = request.nextUrl.pathname;
   const token = await getToken({ req: request });
-  console.log(token);
 
   if (auths.some((path) => pathname.startsWith(path))) {
     if (token) {

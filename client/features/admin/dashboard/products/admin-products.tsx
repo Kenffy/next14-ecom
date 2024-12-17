@@ -19,14 +19,11 @@ export const AdminProducts: FC<AdminProductProps> = (props) => {
   const { isOpened } = useAdminProductState();
 
   useEffect(() => {
-    console.log("effect called...")
     adminProductStore.initAdminProductSession({
       products: products,
       categories: categories,
     });
   }, [products, categories]);
-
-  console.log(products)
 
   return (
     <ScrollArea className="flex-1">

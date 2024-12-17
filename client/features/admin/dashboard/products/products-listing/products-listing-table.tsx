@@ -40,8 +40,8 @@ import { FileModel, ProductModel, VariantModel } from "@/schemas/models";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  adminProductListingStore,
-  useAdminProductListingState,
+  adminListingStore,
+  useAdminListingState,
 } from "./products-listing-store";
 import { UpdateProductVariantSettings } from "./products-listing-service";
 
@@ -55,11 +55,9 @@ export const columns: ColumnDef<VariantModel>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const product = row.original as VariantModel;
-      let productImageUrl: string = "/images/products/product-default.png";
-      if (product && product.images?.length! > 0) {
-        const images = product.images as FileModel[];
-        productImageUrl = images[0].url;
-      }
+      const productImageUrl: string = product.images && product.images?.length > 0
+        ? product.images[0].url
+        : "/images/products/product-default.png";
 
       return (
         <div className="h-20 w-20">
@@ -68,28 +66,28 @@ export const columns: ColumnDef<VariantModel>[] = [
             height={50}
             width={50}
             src={productImageUrl}
-            alt={"variant image"}
+            alt="product variant"
           />
         </div>
       );
     },
   },
   {
-    accessorKey: "color",
+    accessorKey: "sku",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Color
+          Sku
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="lowercase break-all line-clamp-2">
-        {row.getValue("color")}
+        {row.getValue("sku")}
       </div>
     ),
   },
@@ -125,19 +123,18 @@ export const columns: ColumnDef<VariantModel>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="lowercase break-all line-clamp-2">
-        {row.getValue("quantity")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const product = row.original;
+      const quantity = product.inventory.quantity;
+      return (
+        <div className="lowercase break-all line-clamp-2">
+          {quantity}
+        </div>
+      )
+    },
   },
   {
-    accessorKey: "size",
-    header: "size",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("size")}</div>,
-  },
-  {
-    accessorKey: "isDeleted",
+    accessorKey: "deleted",
     header: ({ column }) => {
       return (
         <Button
@@ -151,7 +148,7 @@ export const columns: ColumnDef<VariantModel>[] = [
     },
     cell: ({ row }) => (
       <div className="capitalize">
-        {!row.getValue("isDeleted") ? (
+        {!row.getValue("deleted") ? (
           <span className=" text-green-400">active</span>
         ) : (
           <span className=" text-red-500">inactive</span>
@@ -221,7 +218,7 @@ const useDropdownAction = (props: { productVariant: VariantModel }) => {
         }
         break;
       case "edit":
-        adminProductListingStore.updateProductVariant(productVariant);
+        adminListingStore.updateProductVariant(productVariant);
         break;
     }
     setIsLoading(false);
@@ -234,7 +231,7 @@ const useDropdownAction = (props: { productVariant: VariantModel }) => {
 };
 
 export function ProductListingTable() {
-  const { productVariants } = useAdminProductListingState();
+  const { productVariants } = useAdminListingState();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -276,9 +273,9 @@ export function ProductListingTable() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Search..."
-          value={(table.getColumn("color")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("sku")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("color")?.setFilterValue(event.target.value)
+            table.getColumn("sku")?.setFilterValue(event.target.value)
           }
           className="w-[300px]"
         />

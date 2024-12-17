@@ -1,3 +1,5 @@
+"use client";
+
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import { FC } from "react";
 import { useFormState, useFormStatus } from "react-dom";
@@ -16,18 +18,20 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
   AddOrUpdateProductVariant,
-  adminProductListingStore,
-  useAdminProductListingState,
+  adminListingStore,
+  useAdminListingState,
 } from "./products-listing-store";
 import { ProductImagesInput } from "./products-images-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ProductAttribute } from "@/schemas/models";
 
 interface UpsertProductVariantProps { }
 
 export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
   const initialState: ServerActionResponse | undefined = undefined;
 
-  const { isOpened, product, productVariant } = useAdminProductListingState();
+  const { isOpened, product, productVariant } = useAdminListingState();
 
   const [formState, formAction] = useFormState(
     AddOrUpdateProductVariant,
@@ -38,7 +42,7 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
     <Dialog
       open={isOpened}
       onOpenChange={(value: boolean) => {
-        adminProductListingStore.updateOpened(value);
+        adminListingStore.updateOpened(value);
       }}
     >
       <DialogContent className="sm:max-w-[580px] h-3/4">
@@ -54,6 +58,7 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
           <form action={formAction} className=" flex flex-col gap-6">
             <div className="flex-grow overflow-y-auto flex gap-4 p-1 flex-col flex-1">
               <input type="hidden" name="id" defaultValue={productVariant?._id} />
+              <input type="hidden" name="productId" defaultValue={productVariant?.productId} />
               {formState && formState.status === "OK" ? null : (
                 <>
                   {formState &&
@@ -74,16 +79,16 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
                   defaultValue={productVariant.sku}
                 />
               </div>
-              {/* <div className="grid gap-2">
-                <Label>Size</Label>
-                <Input
-                  type="text"
-                  required
-                  name="size"
-                  placeholder="Size"
-                  defaultValue={productVariant.size}
-                />
-              </div> */}
+              {product?.type === "variable" && product?.attributes && product.attributes.length > 0 && 
+              <>
+              {product.attributes.map((attribute)=> (
+                <div className="grid gap-2" key={attribute.id}>
+                  <Label>{attribute.name}</Label>
+                  <AttributeSelect attribute={attribute as ProductAttribute}/>
+                </div>
+              ))}
+              </>
+              }
               <div className="flex items-center gap-2">
                 <div className="flex-1 gap-2">
                   <Label>Quantity</Label>
@@ -137,7 +142,7 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
               </div> */}
               <div className="grid gap-2">
                 <Label>Product Images</Label>
-                <ProductImagesInput onImagesChange={(formData, size) => adminProductListingStore.updateUploads(formData, size)}/>
+                <ProductImagesInput onImagesChange={(formData, size) => adminListingStore.updateUploads(formData, size)}/>
               </div>
             </div>
             <DialogFooter className="flex items-center justify-end">
@@ -155,11 +160,26 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
 
 function Submit() {
   const status = useFormStatus();
-  const { productVariant } = useAdminProductListingState();
+  const { productVariant } = useAdminListingState();
   return (
     <Button disabled={status.pending} className="gap-2">
       <LoadingIndicator isLoading={status.pending} />
       {productVariant._id !== "" ? "Save Changes" : "Add Product Variant"}
     </Button>
   );
+}
+
+function AttributeSelect({attribute}: {attribute: ProductAttribute}) {
+  return (
+    <Select onValueChange={(value) => adminListingStore.updateVariantAttributeValues(attribute.name, value)}>
+      <SelectTrigger>
+        <SelectValue placeholder={"Select a value"} />
+      </SelectTrigger>
+      <SelectContent>
+        {attribute.values.map((value, index) => (
+          <SelectItem key={index} value={value}>{value}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
 }

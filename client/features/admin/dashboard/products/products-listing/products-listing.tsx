@@ -9,7 +9,7 @@ import {
   ProductModel,
   VariantModel,
 } from "@/schemas/models";
-import { adminProductListingStore } from "./products-listing-store";
+import { adminListingStore } from "./products-listing-store";
 import { UpsertProductVariant } from "./upsert-product-variant";
 import { ProductListingTable } from "./products-listing-table";
 import { AdminProductGallery } from "./products-listing-gallery";
@@ -29,7 +29,7 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
   const productImages: Array<FileModel> = [];
 
   useEffect(() => {
-    adminProductListingStore.initAdminProductVariantSession({
+    adminListingStore.initAdminListingSession({
       product: product,
       productVariants: productVariants,
       categories: categories,
@@ -49,7 +49,7 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
       : "/images/products/product-default.png";
   const productCategories = GetProductCategoryNamesByIds(
     product.categories,
-    adminProductListingStore.categories
+    adminListingStore.categories
   );
 
   return (
@@ -64,9 +64,8 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
           actionTitle="Add Product Variant"
           description=""
           actionDescription="Add a new product variant."
-          disableAction={product.type !== "variable"}
           actionIcon={<PackagePlus />}
-          onClick={() => adminProductListingStore.addProductVariant()}
+          onClick={() => adminListingStore.addProductVariant()}
         ></CustomHero>
         <div className="container max-w-5xl py-6 px-4 md:px-8 mx-auto">
           <div className="flex flex-none gap-4">
@@ -136,17 +135,15 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
           </div>
         </div>
         {product.type === "variable" && productVariants.length > 0 && (
-          <>
-            <div className="container max-w-5xl px-4 md:px-8 py-3 mx-auto">
-              <ProductListingTable />
-            </div>
-            <UpsertProductVariant />
-          </>
+          <div className="container max-w-5xl px-4 md:px-8 py-3 mx-auto">
+            <ProductListingTable />
+          </div>
         )}
         <div className="container max-w-5xl px-4 md:px-8 py-3 mx-auto">
             <AdminProductGallery images={productImages} />
             {/* <ImageSlider images={productImages} /> */}
         </div>
+        <UpsertProductVariant />
       </main>
     </ScrollArea>
   );

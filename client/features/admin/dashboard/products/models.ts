@@ -38,23 +38,24 @@ export const ProductSchema = z.object({
   type: ProductTypeEnum,
   inventory: InventorySchema.optional(),
   brand: z.string().optional(),
-  discount: z.number().optional(),
+  discount: z.number().min(0).max(100).optional(), // Assuming discount is a percentage between 0 and 100
   personalisable: z.boolean().optional(),
 });
 
-export const ProductVariantSchema = z.object({
-  color: z.string().min(1, {
-    message: "Product Color is Required",
-  }),
-  desc: z.string(),
-  size: z.string().min(1, {
-    message: "Size is Required",
+// Define the VariantAttribute schema
+const VariantAttributeSchema = z.object({
+  name: z.string(),
+  value: z.string(),
+});
+
+export const VariantSchema = z.object({
+  sku: z.string().min(1, {
+    message: "SKU is Required",
   }),
   price: z.number().min(1, {
     message: "Price is Required",
   }),
-  quantity: z.number().min(1, {
-    message: "Price is Required",
-  }),
-  discount: z.number(),
+  discount: z.number().min(0).max(100).optional(), // Assuming discount is a percentage between 0 and 100
+  attributes: z.array(VariantAttributeSchema),
+  inventory: InventorySchema.optional(),
 });
