@@ -7,27 +7,37 @@ import {
   adminListingStore,
   useAdminListingState,
 } from "./products-listing-store";
+import { FileModel } from "@/schemas/models";
 
 interface ProductImagesInputProps { 
+  uploadedImages?: Array<FileModel>;
   onImagesChange: (formData: FormData, size: number) => void;
+  onRemoveImage?: (image: FileModel) => void;
 }
 const MAX_UPLOAD_FILES = 5;
 
 export const ProductImagesInput: FC<ProductImagesInputProps> = (props) => {
-  const {onImagesChange} = props;
+  const { uploadedImages, onRemoveImage, onImagesChange} = props;
   const [images, setImages] = useState<File[]>([]);
+  const [warning, setWarning] = useState<string>("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const uploadedSizes = uploadedImages ? uploadedImages.length : 0;
+  const restToUploadSizes = uploadedSizes > 0? MAX_UPLOAD_FILES - uploadedSizes : MAX_UPLOAD_FILES;
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       // FileList not iterable for target == es5
+      setWarning("");
       const files = Object.values(event.target.files);
-      if (images.length + files.length > MAX_UPLOAD_FILES) {
-        const errorMessage = `You exceeded the max upload files: ${MAX_UPLOAD_FILES}. \n\n Only The first  ${MAX_UPLOAD_FILES} files will be selected.`;
+      const totalOfItems = uploadedSizes + images.length + files.length;
+      if (totalOfItems > MAX_UPLOAD_FILES) {
+        const errorMessage = `You exceeded the max upload files: ${MAX_UPLOAD_FILES}. \n\n Only The first  ${restToUploadSizes} files will be selected.`;
         showError(errorMessage);
+        setWarning(errorMessage);
       }
-      const samples = [...images, ...files].slice(0, MAX_UPLOAD_FILES);
+      const samples = [...images, ...files].slice(0, restToUploadSizes);
       setImages([...samples]);
       updateStore(samples);
     }
@@ -52,7 +62,36 @@ export const ProductImagesInput: FC<ProductImagesInputProps> = (props) => {
   };
 
   return (
-    <div className="rounded-md p-2 border">
+    <div className="rounded-md p-2 border flex flex-col gap-4">
+      {warning && <small className=" text-orange-400">{warning}</small>}
+      {onRemoveImage && uploadedImages && uploadedImages.length > 0 &&
+      <>
+      <small>Uploaded images</small>
+      <div className="flex flex-wrap gap-2">
+        {uploadedImages.map((image, index) => (
+          <div
+            key={index}
+            className="relative w-[75px] h-[75px] rounded-sm overflow-hidden bg-muted/50"
+          >
+            <Image
+              height={75}
+              width={75}
+              src={image.url}
+              alt="Uploaded Image"
+              className=" h-full w-full object-cover object-center"
+            />
+            <SquareX
+              onClick={() => onRemoveImage(image)}
+              size={16}
+              className="bg-foreground text-background transition-all duration-75 cursor-pointer absolute top-0 right-0"
+            />
+          </div>
+        ))}
+      </div>
+      </>
+      }
+      <>
+      <small>New images</small>
       <div className="flex flex-wrap gap-2">
         {images.map((image, index) => (
           <div
@@ -82,7 +121,7 @@ export const ProductImagesInput: FC<ProductImagesInputProps> = (props) => {
             ref={fileInputRef}
             style={{ display: "none" }}
           />
-          {images.length < MAX_UPLOAD_FILES && (
+          {images.length < restToUploadSizes && (
             <Button
               className="h-[75px] w-[75px]"
               variant={"secondary"}
@@ -94,6 +133,7 @@ export const ProductImagesInput: FC<ProductImagesInputProps> = (props) => {
           )}
         </>
       </div>
+      </>
     </div>
   );
 };

@@ -24,14 +24,14 @@ import {
 import { ProductImagesInput } from "./products-images-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProductAttribute } from "@/schemas/models";
+import { FileModel, ProductAttribute, VariantAttribute } from "@/schemas/models";
 
 interface UpsertProductVariantProps { }
 
 export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
   const initialState: ServerActionResponse | undefined = undefined;
 
-  const { isOpened, product, productVariant } = useAdminListingState();
+  const { isOpened, product, productVariant, uploadedImages, variantAttributes } = useAdminListingState();
 
   const [formState, formAction] = useFormState(
     AddOrUpdateProductVariant,
@@ -84,7 +84,9 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
               {product.attributes.map((attribute)=> (
                 <div className="grid gap-2" key={attribute.id}>
                   <Label>{attribute.name}</Label>
-                  <AttributeSelect attribute={attribute as ProductAttribute}/>
+                  <AttributeSelect 
+                  value={variantAttributes.find(a => a.name === attribute.name) as VariantAttribute} 
+                  attribute={attribute as ProductAttribute}/>
                 </div>
               ))}
               </>
@@ -119,7 +121,7 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
                   />
                 </div>
                 <div className="flex-1 gap-2">
-                  <Label>Discount Price</Label>
+                  <Label>Discount in %</Label>
                   <Input
                     type="number"
                     required
@@ -129,20 +131,13 @@ export const UpsertProductVariant: FC<UpsertProductVariantProps> = (props) => {
                   />
                 </div>
               </div>
-              {/* <div className="grid gap-2">
-                <Label>Short Description</Label>
-                <Textarea
-                  required
-                  name="desc"
-                  placeholder="Description"
-                  className="resize-none"
-                  rows={3}
-                  defaultValue={productVariant.desc}
-                />
-              </div> */}
               <div className="grid gap-2">
-                <Label>Product Images</Label>
-                <ProductImagesInput onImagesChange={(formData, size) => adminListingStore.updateUploads(formData, size)}/>
+                <Label>Product Images </Label>
+                <ProductImagesInput 
+                uploadedImages={uploadedImages as Array<FileModel>}
+                onRemoveImage={(image) => adminListingStore.removeUploadedImage(image)}
+                onImagesChange={(formData, size) => adminListingStore.updateUploads(formData, size)}
+                />
               </div>
             </div>
             <DialogFooter className="flex items-center justify-end">
@@ -169,11 +164,12 @@ function Submit() {
   );
 }
 
-function AttributeSelect({attribute}: {attribute: ProductAttribute}) {
+function AttributeSelect({attribute, value}: {attribute: ProductAttribute, value: VariantAttribute}) {
   return (
-    <Select onValueChange={(value) => adminListingStore.updateVariantAttributeValues(attribute.name, value)}>
+    <Select 
+    onValueChange={(value) => adminListingStore.updateVariantAttributeValues(attribute.name, value)}>
       <SelectTrigger>
-        <SelectValue placeholder={"Select a value"} />
+        <SelectValue placeholder={value && value.value !== "" ? value.value : "Select a value"} />
       </SelectTrigger>
       <SelectContent>
         {attribute.values.map((value, index) => (

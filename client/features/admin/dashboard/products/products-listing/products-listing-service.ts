@@ -188,7 +188,7 @@ export const DeleteProductVariantAsync = async (
 
     const updatedProductVaraint = await Variant.findByIdAndUpdate(
       productVariantModel._id,
-      { $set: { isDeleted: true } },
+      { $set: { deleted: true } },
       { new: true }
     );
 

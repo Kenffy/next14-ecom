@@ -124,6 +124,10 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
                   <p>{product.material}</p>
                 </div>
                 <div className="w-full flex items-center gap-2">
+                  <span className="font-semibold">Type:</span>
+                  <p>{product.type}</p>
+                </div>
+                <div className="w-full flex items-center gap-2">
                   <span className="font-semibold">Personalisable:</span>
                   <p>{product.personalisable ? "Yes" : "No"}</p>
                 </div>

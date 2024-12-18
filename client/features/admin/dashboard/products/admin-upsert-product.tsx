@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { ProductImagesInput } from "./products-listing/products-images-input";
 import { AddAttribute } from "./admin-add-attribute";
+import { FileModel } from "@/schemas/models";
 
 
 interface UpsertProductProps { }
@@ -23,7 +24,7 @@ export const UpsertProduct: FC<UpsertProductProps> = (props) => {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  const { product, categories, productType } = useAdminProductState();
+  const { product, categories, productType, uploadedImages } = useAdminProductState();
 
   const categoryOptions = categories.filter(c =>c.name.toLocaleLowerCase() !== "all").map(c => {
     return {
@@ -121,7 +122,7 @@ export const UpsertProduct: FC<UpsertProductProps> = (props) => {
                 />
               </div>
               <div className="flex-1 gap-2">
-                <Label>Discount Price</Label>
+                <Label>Discount in %</Label>
                 <Input
                   type="number"
                   name="discount"
@@ -226,7 +227,10 @@ export const UpsertProduct: FC<UpsertProductProps> = (props) => {
             </div>
             <div className="grid gap-2">
                 <Label>Product Images</Label>
-                <ProductImagesInput onImagesChange={(formData, size) => adminProductStore.updateUploads(formData, size)}/>
+                <ProductImagesInput 
+                uploadedImages={uploadedImages as Array<FileModel>}
+                onRemoveImage={(image) => adminProductStore.removeUploadedImage(image)}
+                onImagesChange={(formData, size) => adminProductStore.updateUploads(formData, size)}/>
               </div>
             <div className="flex items-center justify-end gap-4">
               <Button type="button"

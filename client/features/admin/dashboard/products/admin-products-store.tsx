@@ -4,7 +4,7 @@ import { showError, showSuccess } from "@/features/globals/global-message-store"
 import { ProductSchema } from "./models";
 import { CategoryModel, FileModel, ProductAttribute, ProductModel, ProductType } from "@/schemas/models";
 import { proxy, useSnapshot } from "valtio";
-import { CreateProductAsync, UpdateProductAsync, UpdateProductDefaultImageAsync, UploadFileAsync } from "./product-service";
+import { CreateProductAsync, DeleteFileAsync, UpdateProductAsync, UpdateProductDefaultImageAsync, UploadFileAsync } from "./product-service";
 import { uniqueId } from "@/features/common/util";
 
 interface FormState {
@@ -21,10 +21,10 @@ class AdminProductState {
   private defaultModel: ProductModel = {
     _id: "",
     sku: "",
-    name: "Test product title 1",
+    name: "",
     slug: "",
     brand: "",
-    description: "Test product desc 1",
+    description: "",
     defaultImage: "",
     type: "simple",
     images: [],
@@ -154,6 +154,30 @@ class AdminProductState {
       }
     }
   }
+
+  public updateUplaodedImages(images: Array<FileModel>){
+    this.uploadedImages = images;
+  }
+
+  public async removeUploadedImage(image: FileModel){
+    const message = `Are you sure you want to delete this image?\nYou will not be able to recovery the image!`;
+    if (window.confirm(message) && this.product && this.product.images){
+      const deleteResponse = await DeleteFileAsync(image.name, image.location);
+
+      const images = this.product.images.filter(img => img.name !== image.name);
+      const updateResponse = await UpdateProductAsync({
+        ...this.product,
+        images
+      });
+      if(deleteResponse.status === "OK" && updateResponse.status === "OK"){
+        this.updateUplaodedImages(images);
+        return true;
+      }else{
+        return false;
+      }
+    }
+    return false;
+  }
 };
 
 export const adminProductStore = proxy(new AdminProductState());
@@ -203,7 +227,7 @@ export const AddOrUpdateProduct = async (
     if(model._id === ""){
       model.defaultImage = fileUrls[0].url; 
     }
-    model.images = [...fileUrls];
+    model.images = model._id && model._id !== ""? [...adminProductStore.uploadedImages, ...fileUrls]: [...fileUrls];
   }
 
   const response =
@@ -256,7 +280,8 @@ export const FormDataToProductModel = (
     },
     personalisable: formData.get("personalisable") === "on" ? true : false,
     attributes: [],
-    categories: []
+    categories: [],
+    images: []
   };
 };
 

@@ -10,9 +10,10 @@ import { proxy, useSnapshot } from "valtio";
 import {
   CreateProductVariantAsync,
   UpdateProductVariantAsync,
+  UpdateProductVariantSettings,
 } from "./products-listing-service";
 import { VariantSchema } from "@/features/admin/dashboard/products/models";
-import { UpdateProductDefaultImageAsync, UploadFileAsync } from "../product-service";
+import { DeleteFileAsync, UpdateProductDefaultImageAsync, UploadFileAsync } from "../product-service";
 
 interface FormState {
   success: boolean;
@@ -50,6 +51,7 @@ class AdminListingState {
   public productVariants: Array<VariantModel> = [];
   public categories: Array<CategoryModel> = [];
   public variantAttributes: Array<VariantAttribute> = [];
+  public uploadedImages: Array<FileModel> = [];
 
   public initAdminListingSession({
     product,
@@ -89,11 +91,39 @@ class AdminListingState {
     this.productVariant = {
       ...productVariant,
     };
+    this.variantAttributes = productVariant?.attributes && productVariant.attributes.map(a => {
+      return {name: a.name, value: a.value}
+    }) || [];
+    this.uploadedImages = productVariant?.images || [];
     this.isOpened = true;
   }
 
   public updateVariantAttributeValues(name: string, value: string) {
     this.variantAttributes = this.variantAttributes.map(a => a.name === name? {...a, value: value} : a);
+  }
+
+  public updateUplaodedImages(images: Array<FileModel>){
+    this.uploadedImages = images;
+  }
+
+  public async removeUploadedImage(image: FileModel){
+    const message = `Are you sure you want to delete this image?\nYou will not be able to recovery the image!`;
+    if (window.confirm(message) && this.productVariant && this.productVariant.images){
+      const deleteResponse = await DeleteFileAsync(image.name, image.location);
+
+      const images = this.productVariant.images.filter(img => img.name !== image.name)
+      const updateResponse = await UpdateProductVariantAsync({
+        ...this.productVariant,
+        images
+      });
+      if(deleteResponse.status === "OK" && updateResponse.status === "OK"){
+        this.updateUplaodedImages(images);
+        return true;
+      }else{
+        return false;
+      }
+    }
+    return false;
   }
 
   public updateErrors(errors: string[]) {
@@ -172,7 +202,7 @@ export const AddOrUpdateProductVariant = async (
   }
 
   if (fileUrls.length > 0) {
-    model.images = [...fileUrls];
+    model.images = model._id && model._id !== ""? [...adminListingStore.uploadedImages, ...fileUrls]: [...fileUrls];
   }
 
   const response =
