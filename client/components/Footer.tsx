@@ -21,7 +21,7 @@ export default function Footer() {
   const { theme } = useTheme();
   return (
     <footer className=" flex flex-col bg-foreground text-background">
-      <div className=" container py-10 grid md:grid-cols-3 gap-4">
+      <div className=" container max-w-5xl mx-auto py-10 grid md:grid-cols-3 gap-4">
         <div className="flex flex-col gap-4 mb-[2rem] md:mb-0">
           <Link
             href="/"
