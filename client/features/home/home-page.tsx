@@ -9,6 +9,7 @@ import { ReviewSection } from "./review-section";
 import { AboutSection } from "./about-section";
 import { ContactSection } from "./contact-section";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/nav-bar/Navbar";
 
 
 interface HomePageProps {
@@ -26,13 +27,19 @@ export const HomePage: FC<HomePageProps> = (props) => {
     }, [props.products, props.categories]);
 
     return (
-        <div className="flex flex-1 flex-col gap-4 pt-0">
-            <HomeHeader />
-            {props.products.length >= 4 && <ShopSection products={props.products}/>}
-            <ReviewSection />
-            <AboutSection />
-            <ContactSection />
-            <Footer />
+      <div className="w-full flex flex-col min-h-screen mx-auto relative">
+        <Navbar />
+        <div className=" flex-grow">
+          <HomeHeader />
+          {props.products.length >= 4 && (
+            <ShopSection products={props.products} />
+          )}
+          <ReviewSection />
+          <AboutSection />
+          <ContactSection />
         </div>
+
+        <Footer />
+      </div>
     );
 };

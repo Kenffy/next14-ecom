@@ -31,7 +31,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthenticatedProviders>
-            <div className="min-h-full flex flex-col">
+            <div className="flex flex-col relative">
               {children}
             </div>
           </AuthenticatedProviders>

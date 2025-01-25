@@ -12,7 +12,7 @@ interface ReviewSectionProps {
 export const ReviewSection: FC<ReviewSectionProps> = (props) => {
 
     return (
-        <section id="reviews" className=" container max-w-5xl mx-auto flex items-center justify-center py-20">
+        <section id="reviews" className=" container mx-auto flex items-center justify-center py-20">
             <div className=" flex flex-col gap-4">
                 <h2 className=" mb-10 uppercase text-2xl text-center font-semibold">
                     Customer Reviews

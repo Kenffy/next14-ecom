@@ -10,7 +10,7 @@ interface AboutSectionProps {
 export const AboutSection: FC<AboutSectionProps> = (props) => {
 
     return (
-        <section id="about" className=" container max-w-5xl mx-auto py-10 flex items-center">
+        <section id="about" className=" container mx-auto py-10 flex items-center">
             <div className=" flex flex-col gap-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="hidden md:grid grid-cols-2 gap-4">

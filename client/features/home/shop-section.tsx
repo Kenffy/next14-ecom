@@ -21,7 +21,7 @@ export const ShopSection: FC<ShopSectionProps> = (props) => {
     }
 
     return (
-        <section id="shop" className=" container max-w-5xl mx-auto flex items-center justify-center py-20">
+        <section id="shop" className=" container mx-auto flex items-center justify-center py-20">
             <div className=" flex flex-col gap-4">
                 <h2 className=" uppercase text-2xl text-center font-semibold">
                     Our latest products

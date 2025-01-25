@@ -8,7 +8,7 @@ export const HomeHeader = () => {
     return (
         <div
             id="header"
-            className="  max-h-screen container max-w-5xl mx-auto md:px-4 pt-[6rem]"
+            className="  max-h-screen container mx-auto md:px-4 pt-[6rem]"
         >
             <div className="flex flex-col-reverse md:flex-row md:items-center gap-4 md:py-[4rem]">
                 <div className=" flex-1 flex items-center justify-center">

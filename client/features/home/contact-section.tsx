@@ -18,12 +18,12 @@ interface ContactSectionProps {
 export const ContactSection: FC<ContactSectionProps> = (props) => {
 
     return (
-        <section id="contact" className=" container max-w-5xl mx-auto py-20 flex items-center">
+        <section id="contact" className=" container mx-auto py-20 flex items-center">
             <div className=" flex flex-col gap-4">
                 <h2 className=" my-10 uppercase text-2xl text-center font-semibold">
                     Contact
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 border">
                     <div
                         className={`flex flex-col gap-6 p-6 bg-foreground text-background`}
                     >
