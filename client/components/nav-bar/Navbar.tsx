@@ -11,6 +11,7 @@ import { useTheme } from "next-themes";
 import { UserMenu } from "./user-menu";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import GlobalInformationBar from "../GlobalInformationBar";
 
 const links = [
   { name: "Home", href: "/" },
@@ -37,9 +38,11 @@ export default function Navbar() {
 
   return (
     <header
-      className={` fixed top-0 w-full z-20 py-4 border-b bg-background text-foreground`}
+      className={` fixed top-0 w-full z-20 border-b bg-background text-foreground`}
     >
-      <div className=" container flex items-center justify-between mx-auto relative">
+      <>
+      <GlobalInformationBar />
+      <div className=" container flex items-center justify-between mx-auto relative py-4">
         <Link href="/" className=" flex items-center">
           <Image
             src={
@@ -130,6 +133,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      </>
     </header>
   );
 }
