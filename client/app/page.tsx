@@ -1,6 +1,6 @@
 import { DisplayError } from "@/components/ui/error/display-error";
 import { GetCategoriesAsync } from "@/features/admin/dashboard/categories/category-service";
-import { GetAllProductsAsync, GetBaseProductsAsync } from "@/features/admin/dashboard/products/product-service";
+import { GetBaseProductsAsync } from "@/features/admin/dashboard/products/product-service";
 import { HomePage } from "@/features/home/home-page";
 
 export const metadata = {

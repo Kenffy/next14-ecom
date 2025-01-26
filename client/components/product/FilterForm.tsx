@@ -1,0 +1,57 @@
+"use client";
+
+import React from "react";
+import SearchForm from "../SearchForm";
+import CustomSelect from "../CustomSelect";
+import CustomPriceFilterForm from "../CustomPriceFilterForm";
+import { Button } from "../ui/button";
+import { shopStore, useShopState } from "@/features/client/shop-page/shop-store";
+import { CategoryModel } from "@/schemas/models";
+
+export default function FilterForm({
+  isSideFilter,
+}: {
+  isSideFilter?: boolean;
+}) {
+  const { categories, filterCategory } = useShopState();
+  return (
+    <div className=" flex flex-col gap-6">
+      <h2 className=" text-3xl mt-2">Filters</h2>
+
+      <div className=" flex flex-col gap-2">
+        <h4>Search</h4>
+        <SearchForm />
+      </div>
+
+      <div className=" flex flex-col gap-2">
+        <h4>Categories</h4>
+        <CustomSelect
+          selected={filterCategory}
+          onChange={shopStore.updateFilterCategory}
+          items={categories as Array<CategoryModel>}
+          width="w-full"
+        />
+      </div>
+      <div className=" flex flex-col gap-2">
+        <h4>Price</h4>
+        <CustomPriceFilterForm />
+      </div>
+      {/* <div>
+        <h4>Colors</h4>
+      </div> */}
+
+      <div className=" flex gap-2 items-center justify-around">
+        {isSideFilter && (
+          <Button
+            variant="outline"
+            onClick={() => shopStore.updateOpened(false)}
+            className=" flex-1 py-1 px-2  "
+          >
+            Cancel
+          </Button>
+        )}
+        <Button className=" flex-1 py-1 px-2  ">Apply</Button>
+      </div>
+    </div>
+  );
+}

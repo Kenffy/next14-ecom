@@ -18,9 +18,9 @@ export default function RootLayout({
 }) {
     return (
         <AuthenticatedProviders>
-            <div className={cn("flex flex-col flex-1 items-stretch min-h-screen")}>
+            <div className={cn("flex flex-col min-h-screen")}>
                 <Navbar />
-                <div className="flex-1 flex">{children}</div>
+                <div className="w-full">{children}</div>
                 <Footer />
             </div>
         </AuthenticatedProviders>

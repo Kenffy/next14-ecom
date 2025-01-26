@@ -9,49 +9,6 @@ export const UsersData = [
   },
 ];
 
-export const CategoriesData = [
-  {
-    name: "All",
-    banner: "",
-    desc: "All Collectios",
-    image: "/images/categories/all.png",
-    brand: "new collections for every one",
-    value: "all",
-  },
-  {
-    name: "Women",
-    banner: "",
-    desc: "Women Collections",
-    image: "/images/categories/women.png",
-    brand: "women collections",
-    value: "women",
-  },
-  {
-    name: "Men",
-    banner: "",
-    desc: "Men Collections",
-    image: "/images/categories/men.png",
-    brand: "men collections",
-    value: "men",
-  },
-  {
-    name: "Kids",
-    banner: "",
-    desc: "Kids Collections",
-    image: "/images/categories/kids.png",
-    brand: "kids collections",
-    value: "kids",
-  },
-  {
-    name: "Accessoiries",
-    banner: "",
-    desc: "All Accessoiries",
-    image: "/images/categories/accessoiries.png",
-    brand: "new arrivals only",
-    value: "accessoiries",
-  },
-];
-
 export const Reviews = [
   {
     id: 1,
@@ -89,4 +46,29 @@ export const Reviews = [
     createdAt: "03 Feb, 2023",
     productId: "",
   },
+];
+
+export const Sorts = [
+  { id: 1, type: "Relevancy", value: "relevancy" },
+  { id: 2, type: "Lowest Price", value: "asc" },
+  { id: 3, type: "Highest Price", value: "desc" },
+  { id: 4, type: "Most Recent", value: "recent" },
+];
+
+export const FilterPrices = [
+  { id: 1, type: "< EUR 19,00", value: "0, 19.0" },
+  { id: 2, type: "EUR 19,00 - 35,00", value: "19.0, 35.0" },
+  { id: 3, type: "> EUR 35,00", value: "35.0, 9999" },
+];
+
+export const Paymentmethods = [
+  { id: 1, type: "Card", icon: "/images/mcard.png", value: "Card" },
+  { id: 2, type: "Paypal", icon: "/images/paypal.png", value: "Paypal" },
+  {
+    id: 3,
+    type: "Google Pay",
+    icon: "/images/gpay.png/card",
+    value: "Google-Pay",
+  },
+  // { id: 4, type: "Cash on delivery", icon:"/card", value: "Cash" },
 ];
