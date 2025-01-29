@@ -13,7 +13,7 @@ export default function Filters() {
       } duration-150 min-h-screen w-full fixed flex left-0 z-30 bg-black/50`}
     >
       <div
-        className={` z-50 flex flex-col gap-4 p-4 min-w-[70%] md:min-w-[40%] lg:min-w-[450px] min-h-screen overflow-y-auto bg-background text-foreground relative`}
+        className={` z-50 flex flex-col gap-4 p-4 min-w-[70%] md:min-w-[40%] lg:min-w-[250px] min-h-screen overflow-y-auto bg-background text-foreground relative`}
       >
         <GrClose
           onClick={() => shopStore.updateOpened(false)}

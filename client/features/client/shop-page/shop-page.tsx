@@ -34,10 +34,10 @@ export const ShopPage: FC<ShopPageProps> = (props) => {
         <Filters />
         <div className="container mx-auto">
           <div className="flex">
-            <div className=" flex-none hidden lg:grid lg:col-span-1 pt-16 pr-6">
+            <div className=" flex-none min-w-[70%] md:min-w-[40%] lg:min-w-[250px] hidden lg:grid lg:col-span-1 pt-16 pr-6">
               <FilterForm />
             </div>
-            <div className="flex-4 flex-grow">
+            <div className="flex-grow">
             <ProductsList />
             </div>
             

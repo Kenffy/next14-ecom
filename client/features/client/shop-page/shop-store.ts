@@ -26,7 +26,7 @@ class ShopState {
   }) {
     this.products = products;
     this.categories = categories;
-    this.filterCategory = categories[0];
+    this.filterCategory = this.categories[0];
   }
 
 
@@ -50,7 +50,7 @@ class ShopState {
 
   public updateFilterCategory(value: CategoryModel){
     console.log("update categories: ", value)
-    this.filterCategory = value;
+    this.filterCategory = {...value};
   }
 
   public updateSearch(value: string){

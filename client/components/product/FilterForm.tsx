@@ -2,11 +2,14 @@
 
 import React from "react";
 import SearchForm from "../SearchForm";
-import CustomSelect from "../CustomSelect";
 import CustomPriceFilterForm from "../CustomPriceFilterForm";
 import { Button } from "../ui/button";
-import { shopStore, useShopState } from "@/features/client/shop-page/shop-store";
+import {
+  shopStore,
+  useShopState,
+} from "@/features/client/shop-page/shop-store";
 import { CategoryModel } from "@/schemas/models";
+import { CustomComboBox } from "../CustomComboBox";
 
 export default function FilterForm({
   isSideFilter,
@@ -15,7 +18,7 @@ export default function FilterForm({
 }) {
   const { categories, filterCategory } = useShopState();
   return (
-    <div className=" flex flex-col gap-6">
+    <div className=" flex flex-col gap-6 w-full">
       <h2 className=" text-3xl mt-2">Filters</h2>
 
       <div className=" flex flex-col gap-2">
@@ -25,9 +28,9 @@ export default function FilterForm({
 
       <div className=" flex flex-col gap-2">
         <h4>Categories</h4>
-        <CustomSelect
-          selected={filterCategory}
-          onChange={shopStore.updateFilterCategory}
+        <CustomComboBox
+          selected={filterCategory as CategoryModel}
+          onChange={(value) => shopStore.updateFilterCategory(value)}
           items={categories as Array<CategoryModel>}
           width="w-full"
         />
