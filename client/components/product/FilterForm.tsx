@@ -8,7 +8,6 @@ import {
   shopStore,
   useShopState,
 } from "@/features/client/shop-page/shop-store";
-import { CategoryModel } from "@/schemas/models";
 import { CustomComboBox } from "../CustomComboBox";
 
 export default function FilterForm({
@@ -17,6 +16,7 @@ export default function FilterForm({
   isSideFilter?: boolean;
 }) {
   const { categories, filterCategory } = useShopState();
+
   return (
     <div className=" flex flex-col gap-6 w-full">
       <h2 className=" text-3xl mt-2">Filters</h2>
@@ -29,9 +29,9 @@ export default function FilterForm({
       <div className=" flex flex-col gap-2">
         <h4>Categories</h4>
         <CustomComboBox
-          selected={filterCategory as CategoryModel}
+          selected={filterCategory as string}
           onChange={(value) => shopStore.updateFilterCategory(value)}
-          items={categories as Array<CategoryModel>}
+          items={categories as Array<string>}
           width="w-full"
         />
       </div>
@@ -39,9 +39,6 @@ export default function FilterForm({
         <h4>Price</h4>
         <CustomPriceFilterForm />
       </div>
-      {/* <div>
-        <h4>Colors</h4>
-      </div> */}
 
       <div className=" flex gap-2 items-center justify-around">
         {isSideFilter && (
@@ -53,7 +50,7 @@ export default function FilterForm({
             Cancel
           </Button>
         )}
-        <Button className=" flex-1 py-1 px-2  ">Apply</Button>
+        <Button onClick={()=> shopStore.updateFilter()} className=" flex-1 py-1 px-2  ">Apply</Button>
       </div>
     </div>
   );

@@ -1,13 +1,7 @@
 "use client"
 
-import CustomPagination from "@/components/CustomPagination";
-import CustomSelect from "@/components/CustomSelect";
-import ProductCard from "@/components/product/ProductCard";
-import { Sorts } from "@/data/data";
 import React, { FC, useEffect } from "react";
-import { shopStore, useShopState } from "./shop-store";
-import { LucideSettings2 } from "lucide-react";
-import ProductReviews from "@/components/product/Reviews";
+import { shopStore } from "./shop-store";
 import { BaseProductModel, CategoryModel } from "@/schemas/models";
 import BannerSlider from "@/components/product/BannerSlider";
 import Filters from "@/components/product/Filters";
@@ -24,7 +18,7 @@ export const ShopPage: FC<ShopPageProps> = (props) => {
   useEffect(() => {
     shopStore.initShopSession({
       products: props.products,
-      categories: props.categories,
+      categories: props.categories.map((category) => category.name),
     });
   }, [props.products, props.categories]);
 
@@ -34,7 +28,7 @@ export const ShopPage: FC<ShopPageProps> = (props) => {
         <Filters />
         <div className="container mx-auto">
           <div className="flex">
-            <div className=" flex-none min-w-[70%] md:min-w-[40%] lg:min-w-[250px] hidden lg:grid lg:col-span-1 pt-16 pr-6">
+            <div className=" flex-none w-[70%] sm:w-80 md:w-72 hidden md:flex pt-16 pr-6">
               <FilterForm />
             </div>
             <div className="flex-grow">

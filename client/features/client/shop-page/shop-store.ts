@@ -1,5 +1,5 @@
 import { Sorts } from "@/data/data";
-import { CategoryModel, BaseProductModel } from "@/schemas/models";
+import { BaseProductModel } from "@/schemas/models";
 import { proxy, useSnapshot } from "valtio";
 
 class ShopState {
@@ -10,19 +10,21 @@ class ShopState {
   }
   public filterSort = Sorts[0];
 
-  public filterCategory: CategoryModel | undefined;
+  public filterCategory: string = "";
   public errors: string[] = [];
   public products: Array<BaseProductModel> = [];
-  public categories: Array<CategoryModel> = [];
+  public sorts: Array<string> = [];
+  public categories: Array<string> = [];
   public isOpened: boolean = false;
   public search: string = "";
+  public filter = "";
 
   public initShopSession({
     products,
     categories
   }: {
     products: Array<BaseProductModel>;
-    categories: Array<CategoryModel>;
+    categories: Array<string>;
   }) {
     this.products = products;
     this.categories = categories;
@@ -38,24 +40,27 @@ class ShopState {
     this.errors = errors;
   }
 
-  public updateFilterSort(values: {id: number, type: string, value: string}){
-    console.log("update sorts: ", values)
-    this.filterSort = values;
+  public updateFilterSort(value: string){
+    const sort = Sorts.find((sort) => sort.value === value);
+    if(sort){
+      this.filterSort = sort;
+    }
   }
 
   public updateFilterPrice(values: {minPrice: number, maxPrice: number}){
-    console.log("update prices: ", values)
     this.filterPrice = values;
   }
 
-  public updateFilterCategory(value: CategoryModel){
-    console.log("update categories: ", value)
-    this.filterCategory = {...value};
+  public updateFilterCategory(value: string){
+    this.filterCategory = value;
   }
 
   public updateSearch(value: string){
     this.search = value;
-    console.log("search: ", this.search)
+  }
+
+  public updateFilter(){
+    this.filter = `?category=${this.filterCategory}&sort=${this.filterSort.value}&minPrice=${this.filterPrice.minPrice}&maxPrice=${this.filterPrice.maxPrice}&search=${this.search}`;
   }
 };
 
