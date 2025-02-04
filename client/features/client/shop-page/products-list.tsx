@@ -16,7 +16,7 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function ProductsList() {
-  const { products, categories, filterCategory } = useShopState();
+  const { productData, categories, filterCategory } = useShopState();
 
   return (
     <div className="min-h-screen w-full flex flex-col pt-16 ">
@@ -36,7 +36,7 @@ export default function ProductsList() {
                 return (
                   <div
                     key={index}
-                    onClick={() => shopStore.updateFilterCategory(category)}
+                    onClick={() => shopStore.updateByCategory(category)}
                     className={`border py-1 px-4 cursor-pointer rounded-md ${
                       category == filterCategory &&
                       "bg-foreground text-background"
@@ -57,12 +57,17 @@ export default function ProductsList() {
         </div>
         <div className=" flex flex-col my-[2rem] gap-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 md:grid-cols-3 xl:grid-cols-4">
-            {products.map((product) => (
+            {productData?.data.map((product) => (
               <ProductCard key={product.slug} product={product} />
             ))}
           </div>
           <div className="mt-[4rem]">
-            <CustomPagination />
+            <CustomPagination
+              currentPage={productData?.currentPage as number}
+              totalPages={productData?.totalPages as number}
+              totalRecords={productData?.totalRecords as number}
+              goToPage={(page) => shopStore.updatePage(page)}  
+            />
           </div>
         </div>
 

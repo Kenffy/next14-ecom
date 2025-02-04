@@ -50,7 +50,7 @@ export default function FilterForm({
             Cancel
           </Button>
         )}
-        <Button onClick={()=> shopStore.updateFilter()} className=" flex-1 py-1 px-2  ">Apply</Button>
+        <Button onClick={()=> shopStore.updateFilters()} className=" flex-1 py-1 px-2  ">Apply</Button>
       </div>
     </div>
   );

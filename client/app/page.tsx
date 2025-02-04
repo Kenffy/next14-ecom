@@ -1,6 +1,6 @@
 import { DisplayError } from "@/components/ui/error/display-error";
 import { GetCategoriesAsync } from "@/features/admin/dashboard/categories/category-service";
-import { GetBaseProductsAsync } from "@/features/admin/dashboard/products/product-service";
+import { GetBaseFeaturedProductsAsync } from "@/features/admin/dashboard/products/product-service";
 import { HomePage } from "@/features/home/home-page";
 
 export const metadata = {
@@ -10,7 +10,7 @@ export const metadata = {
 
 export default async function Home() {
   const [productResponse, categoryResponse] = await Promise.all([
-    GetBaseProductsAsync(),
+    GetBaseFeaturedProductsAsync(),
     GetCategoriesAsync(),
   ]);
 

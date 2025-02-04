@@ -11,22 +11,30 @@ export const metadata = {
 };
 
 export default async function Shop() {
-  const [productResponse, categoryResponse] = await Promise.all([
-    GetBaseProductsAsync(),
+  const filters = {
+    category: "",
+    sort: "",
+    minPrice: 0,
+    maxPrice: 0,
+    search: "",
+  };
+  const [paginationResponse, categoryResponse] = await Promise.all([
+    GetBaseProductsAsync(filters, 1, 2),
     GetCategoriesAsync(),
   ]);
 
-  if (productResponse.status !== "OK") {
-    return <DisplayError errors={productResponse.errors} />;
+  if (paginationResponse.status !== "OK") {
+    return <DisplayError errors={paginationResponse.errors} />;
   }
 
   if (categoryResponse.status !== "OK") {
     return <DisplayError errors={categoryResponse.errors} />;
   }
+
   return (
     <main className="flex min-h-screen">
       <ShopPage
-        products={[...productResponse.response] as Array<BaseProductModel>}
+        products={paginationResponse.response}
         categories={[...categoryResponse.response] as Array<CategoryModel>}
       />
     </main>

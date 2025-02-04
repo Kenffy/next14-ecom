@@ -1,5 +1,6 @@
 import { Sorts } from "@/data/data";
-import { BaseProductModel } from "@/schemas/models";
+import { GetBaseProductsAsync } from "@/features/admin/dashboard/products/product-service";
+import { BaseProductModel, PaginationResponse } from "@/schemas/models";
 import { proxy, useSnapshot } from "valtio";
 
 class ShopState {
@@ -12,25 +13,45 @@ class ShopState {
 
   public filterCategory: string = "";
   public errors: string[] = [];
-  public products: Array<BaseProductModel> = [];
+  public productData: PaginationResponse<BaseProductModel> | undefined;
   public sorts: Array<string> = [];
   public categories: Array<string> = [];
   public isOpened: boolean = false;
   public search: string = "";
-  public filter = "";
+  public filters = {
+    category: "",
+    sort: "",
+    minPrice: 0,
+    maxPrice: 0,
+    search: ""
+  };
 
   public initShopSession({
     products,
     categories
   }: {
-    products: Array<BaseProductModel>;
+    products: PaginationResponse<BaseProductModel>;
     categories: Array<string>;
   }) {
-    this.products = products;
+    this.productData = products;
     this.categories = categories;
     this.filterCategory = this.categories[0];
   }
 
+  private getCategoryId(category: string){
+    return this.categories.find((cat) => cat === category);
+  }
+
+  private resetFilters(){
+    this.filterPrice = {
+      minPrice: 0,
+      maxPrice: 0,
+    }
+    this.filterSort = Sorts[0];
+    this.filterCategory = this.categories[0];
+    this.search = "";
+    this.updateFilters();
+  }
 
   public updateOpened(value: boolean) {
     this.isOpened = value;
@@ -59,8 +80,35 @@ class ShopState {
     this.search = value;
   }
 
-  public updateFilter(){
-    this.filter = `?category=${this.filterCategory}&sort=${this.filterSort.value}&minPrice=${this.filterPrice.minPrice}&maxPrice=${this.filterPrice.maxPrice}&search=${this.search}`;
+  public async updateByCategory(category: string){
+    this.filterCategory = category;
+    this.updateFilters();
+  }
+
+  public async updatePage(page: number){
+    const response = await GetBaseProductsAsync(this.filters, page, 2);
+    if(response.status !== "OK"){
+      //this.errors = response.errors;
+      return;
+    }
+    this.productData = response.response;
+  }
+
+  public async updateFilters(){
+    this.filters = {
+      category: this.filterCategory,
+      sort: this.filterSort.value,
+      minPrice: this.filterPrice.minPrice,
+      maxPrice: this.filterPrice.maxPrice,
+      search: this.search
+    }
+
+    const response = await GetBaseProductsAsync(this.filters, 1, 2);
+    if(response.status !== "OK"){
+      //this.errors = response.errors;
+      return;
+    }
+    this.productData = response.response;
   }
 };
 

@@ -2,14 +2,14 @@
 
 import React, { FC, useEffect } from "react";
 import { shopStore } from "./shop-store";
-import { BaseProductModel, CategoryModel } from "@/schemas/models";
+import { BaseProductModel, CategoryModel, PaginationResponse } from "@/schemas/models";
 import BannerSlider from "@/components/product/BannerSlider";
 import Filters from "@/components/product/Filters";
 import FilterForm from "@/components/product/FilterForm";
 import ProductsList from "./products-list";
 
 interface ShopPageProps {
-  products: Array<BaseProductModel>;
+  products: PaginationResponse<BaseProductModel>;
   categories: Array<CategoryModel>;
 }
 

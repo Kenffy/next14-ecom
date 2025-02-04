@@ -36,6 +36,14 @@ export interface Dimension {
   height: number;
 }
 
+export interface ProductFilter {
+  category: string;
+  sort: string;
+  minPrice: number;
+  maxPrice: number;
+  search: string;
+}
+
 export interface BaseProductModel {
   slug?: string;
   name: string;
@@ -43,6 +51,14 @@ export interface BaseProductModel {
   rating?: number;
   discount?: number;
   defaultImage?: string;
+}
+
+export interface PaginationResponse<T> {
+  data: T[];
+  totalRecords: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
 }
 
 export interface ProductModel {

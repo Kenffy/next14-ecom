@@ -49,7 +49,7 @@ export const Reviews = [
 ];
 
 export const Sorts = [
-  { id: 1, type: "Relevancy", value: "relevancy" },
+  //{ id: 1, type: "Relevancy", value: "relevancy" },
   { id: 2, type: "Lowest Price", value: "asc" },
   { id: 3, type: "Highest Price", value: "desc" },
   { id: 4, type: "Most Recent", value: "recent" },

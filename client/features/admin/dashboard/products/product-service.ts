@@ -6,7 +6,9 @@ import mongoDbConnection from "@/features/common/services/mongo";
 import {
   BaseProductModel,
   FileModel,
+  PaginationResponse,
   ProductAttribute,
+  ProductFilter,
   ProductModel,
   UploadResponse,
 } from "@/schemas/models";
@@ -87,10 +89,13 @@ export const GetAllProductsAsync = async (
   try {
     await mongoDbConnection();
     const resources = await Product.find({ ...filters });
-    const recordProducts = resources.length > 0 ? resources.map((prod) => {
-      const product = performProductMapping(prod._doc as ProductModel);
-      return product;
-    }) : [];
+    const recordProducts =
+      resources.length > 0
+        ? resources.map((prod) => {
+            const product = performProductMapping(prod._doc as ProductModel);
+            return product;
+          })
+        : [];
     return {
       status: "OK",
       response: recordProducts,
@@ -130,7 +135,7 @@ const performProductMapping = (product: ProductModel) => {
   return mappedProduct;
 };
 
-export const GetBaseProductsAsync = async (
+export const GetBaseFeaturedProductsAsync = async (
   filters?: ProductFilterProps
 ): Promise<ServerActionResponse<Array<BaseProductModel>>> => {
   try {
@@ -145,6 +150,83 @@ export const GetBaseProductsAsync = async (
     return {
       status: "OK",
       response: recordProducts,
+    };
+  } catch (error) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${error}` }],
+    };
+  }
+};
+
+export const GetBaseProductsAsync = async (
+  filters: ProductFilter,
+  page: number = 1,
+  limit: number = 10
+): Promise<ServerActionResponse<PaginationResponse<BaseProductModel>>> => {
+  try {
+    await mongoDbConnection();
+    // Building the query object dynamically
+    const query: any = { deleted: false };
+    const attributes = "slug name price discount reviews defaultImage";
+
+    // if (filters.category && filters.category.toLocaleLowerCase() !== "all")
+    //   query.category = filters.category;
+    if (filters.category && filters.category.toLocaleLowerCase() !== "all") query.categories = { $in: [filters.category] }; // Supports multiple categories
+    if (filters.minPrice !== undefined && filters.minPrice > 0)
+      query.price = { ...query.price, $gte: filters.minPrice };
+    if (filters.maxPrice !== undefined && filters.maxPrice > 0)
+      query.price = { ...query.price, $lte: filters.maxPrice };
+    if (filters.search) query.name = { $regex: filters.search, $options: "i" }; // Case-insensitive search
+    console.log("query: ", query);
+
+    // Sorting logic
+    const sortOptions: any = {};
+    switch (filters.sort) {
+      case "asc":
+        sortOptions.price = 1; // Lowest Price First
+        break;
+      case "desc":
+        sortOptions.price = -1; // Highest Price First
+        break;
+      case "recent":
+        sortOptions.createdAt = -1; // Most Recent First
+        break;
+      // case "relevancy":
+      //   if (search) {
+      //     sortOptions.score = { $meta: "textScore" }; // Text search relevance (if implemented)
+      //   }
+      //   break;
+      default:
+        break;
+    }
+
+    // Pagination calculations
+    const skip = (page - 1) * limit;
+
+    //const resources = await Product.find({ ...filters }, attributes).exec();
+    // Fetching filtered and paginated products
+    const resources = await Product.find(query, attributes)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const totalRecords = await Product.countDocuments(query); // For pagination metadata
+
+    const recordProducts = resources.map<BaseProductModel>((prod: any) => {
+      return { ...prod, _id: prod._id.toString() };
+    });
+    
+    return {
+      status: "OK",
+      response: {
+        data: recordProducts,
+        currentPage: page,
+        totalPages: Math.ceil(totalRecords / limit),
+        totalRecords,
+        limit,
+      },
     };
   } catch (error) {
     return {
