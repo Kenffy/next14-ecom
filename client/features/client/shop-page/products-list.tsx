@@ -17,7 +17,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function ProductsList() {
   const { productData, categories, filterCategory } = useShopState();
-
+  const categoryItems = categories.map((c) => c.name) as Array<string>;
   return (
     <div className="min-h-screen w-full flex flex-col pt-16 ">
       <div className=" md:p-0 mx-auto ">
@@ -32,7 +32,7 @@ export default function ProductsList() {
 
           <ScrollArea className="w-full whitespace-nowrap">
             <div className=" hidden md:flex flex-grow items-center gap-2">
-              {categories.map((category, index) => {
+              {categoryItems.map((category, index) => {
                 return (
                   <div
                     key={index}

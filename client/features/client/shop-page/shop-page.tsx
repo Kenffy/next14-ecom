@@ -18,7 +18,7 @@ export const ShopPage: FC<ShopPageProps> = (props) => {
   useEffect(() => {
     shopStore.initShopSession({
       products: props.products,
-      categories: props.categories.map((category) => category.name),
+      categories: props.categories,
     });
   }, [props.products, props.categories]);
 

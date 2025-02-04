@@ -19,7 +19,7 @@ export default async function Shop() {
     search: "",
   };
   const [paginationResponse, categoryResponse] = await Promise.all([
-    GetBaseProductsAsync(filters, 1, 2),
+    GetBaseProductsAsync(filters),
     GetCategoriesAsync(),
   ]);
 

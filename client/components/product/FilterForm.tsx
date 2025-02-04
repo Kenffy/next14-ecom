@@ -31,7 +31,7 @@ export default function FilterForm({
         <CustomComboBox
           selected={filterCategory as string}
           onChange={(value) => shopStore.updateFilterCategory(value)}
-          items={categories as Array<string>}
+          items={categories.map(c => c.name) as Array<string>}
           width="w-full"
         />
       </div>
