@@ -70,7 +70,7 @@
     @apply border-border;
   }
   *::-webkit-scrollbar {
-    @apply h-2 w-2;
+    @apply h-1 w-1;
   }
 
   *::-webkit-scrollbar-track {
@@ -88,6 +88,9 @@
   }
   .no-scrollbar::-webkit-scrollbar {
     @apply h-0;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    @apply hidden;
   }
 }
 

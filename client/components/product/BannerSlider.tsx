@@ -51,7 +51,7 @@ export default function BannerSlider() {
                   {category.brand}
                 </h2>
                 <Button
-                  onClick={() => shopStore.updateFilterCategory(category)}
+                  onClick={() => shopStore.updateByCategory(category.name)}
                   variant="outline"
                   className=" w-fit uppercase dark:text-foreground"
                 >

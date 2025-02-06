@@ -10,7 +10,7 @@ export default function ProductCard({ product }: { product: BaseProductModel }) 
 
   const productImageUrl: string = product.defaultImage ? product.defaultImage : "/images/products/product-default.png";
   return (
-    <Link href={`/product/${product.slug}`}>
+    <Link href={`/shop/${product.slug}`}>
       <Card className=" flex flex-col hover:scale-[1.02] duration-100 rounded-md overflow-hidden">
         <Image
           src={productImageUrl}
