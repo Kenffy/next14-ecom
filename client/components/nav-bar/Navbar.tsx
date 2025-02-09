@@ -12,6 +12,7 @@ import { UserMenu } from "./user-menu";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import GlobalInformationBar from "../GlobalInformationBar";
+import useCartService from "@/hooks/useCartStore";
 
 const links = [
   { name: "Home", href: "/" },
@@ -22,8 +23,7 @@ const links = [
 ];
 
 export default function Navbar() {
-  //const { items } = useCartService();
-  const items:any = [];
+  const { items } = useCartService();
   const { theme } = useTheme();
   const path = usePathname();
 

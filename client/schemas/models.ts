@@ -115,6 +115,31 @@ export interface VariantModel {
   updatedAt?: Date;
 }
 
+export type OrderItem = {
+  name: string;
+  slug: string;
+  qty: number;
+  image: FileModel;
+  variable: boolean;
+  variantId?: string;
+  attributes?: Array<VariantAttribute>;
+  personalisable: boolean;
+  personalisation?: string;
+  productId: string;
+  price: number;
+  discount?: number;
+};
+
+export type Cart = {
+  items: OrderItem[];
+  itemsPrice: number;
+  taxPrice: number;
+  shippingPrice: number;
+  totalPrice: number;
+  paymentMethod: string;
+  shippingAddress: AddressModel;
+};
+
 export type ProductDimension = {
   length: number;
   width: number;

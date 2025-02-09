@@ -1,14 +1,17 @@
 "use client";
 
-import ImageViewer from "@/components/ImageViewer";
-import { FileModel, ProductModel, VariantModel } from "@/schemas/models";
+import {
+  FileModel,
+  OrderItem,
+  ProductModel,
+  VariantModel,
+} from "@/schemas/models";
 import Link from "next/link";
-import React, { FC, useRef, useState } from "react";
+import React, { FC, useState } from "react";
 import { ProductDetails } from "./product-details";
 import { ArrowLeft } from "lucide-react";
 import { ImageSlider } from "@/components/ImageSlider";
 import { Textarea } from "@/components/ui/textarea";
-import CustomSelect from "@/components/CustomSelect";
 
 import {
   Select,
@@ -18,7 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import ProductReviews from "@/components/product/Reviews";
+import { AddToCart } from "./add-cart";
 import { Button } from "@/components/ui/button";
 
 interface ProductPageProps {
@@ -29,6 +33,7 @@ interface ProductPageProps {
 export const ProductPage: FC<ProductPageProps> = (props) => {
   const { product, variants } = props;
   const [personalisation, setPersonalisation] = useState<string>("");
+  const [errors, setErrors] = useState<string>("");
   const [selectedAttributes, setSelectedAttributes] = useState<{
     [key: string]: string;
   }>({});
@@ -50,6 +55,56 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
       );
       setSelectedVariant(matchingVariant || null);
     }
+    setErrors("");
+  };
+
+  const getProductPrice = () => {
+    return selectedVariant ? selectedVariant.price : product.price;
+  };
+
+  const getProductDiscountPrice = () => {
+    return selectedVariant ? selectedVariant.discount : product.discount;
+  };
+
+  const getProductImage = () => {
+    if (
+      (product.images && product.images.length > 0) ||
+      (selectedVariant?.images && selectedVariant.images.length > 0)
+    ) {
+      return selectedVariant?.images
+        ? selectedVariant.images[0]
+        : product.images
+        ? product.images[0]
+        : null;
+    }
+    return null;
+  };
+
+  const handleErrors = () => {
+    if (product.type === "variable" && !selectedVariant || !personalisation) {
+      // const attributes = product.attributes && product.attributes?.length > 0
+      //   ? product.attributes.map((attr) => attr.name).join(", ")
+      //   : "all attributes";
+      const message = `Please select fill all the required fields to continue`;
+      setErrors(message);
+    }
+  };
+
+  console.log("selectedVariant: ", selectedVariant);
+
+  const orderItem: OrderItem = {
+    name: product.name,
+    slug: product.slug as string,
+    price: getProductPrice(),
+    discount: getProductDiscountPrice(),
+    productId: product._id!,
+    image: getProductImage() as FileModel,
+    personalisable: product.personalisable as boolean,
+    personalisation: personalisation,
+    qty: 0,
+    variable: product.type === "variable",
+    variantId: selectedVariant?._id,
+    attributes: selectedVariant?.attributes,
   };
 
   return (
@@ -68,123 +123,140 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
         </div>
 
         <div className="w-full md:col-span-2">
-          <h1 className="text-md lg:text-xl font-semibold mb-2">
-            Personalised Christmas Sweaters, Family Sweatshirts Christmas,
-            Uniform Family Holiday Outfit, Christmas Family Pyjamas for All
+          <h1 className="text-2xl lg:text-4xl font-bold mb-2">
+            {product.name}
           </h1>
           <div className="flex items-center mb-4">
-            <span className="text-2xl font-bold">
+            <span className="text-3xl font-bold">
               €
               {selectedVariant
-                ? selectedVariant.discount as number > 0 ? selectedVariant.discount : selectedVariant.price
-                : product.discount as number > 0 ? product.discount : product.price}
+                ? (selectedVariant.discount as number) > 0
+                  ? selectedVariant.discount
+                  : selectedVariant.price
+                : (product.discount as number) > 0
+                ? product.discount
+                : product.price}
             </span>
-            {selectedVariant?.discount as number > 0 || product?.discount as number > 0 &&
-            <span className="line-through ml-3 text-gray-500">
-              €{selectedVariant ? selectedVariant.price : product.price}
-            </span>}
+            {(selectedVariant?.discount as number) > 0 ||
+              ((product?.discount as number) > 0 && (
+                <span className="line-through ml-3 text-gray-500">
+                  €{selectedVariant ? selectedVariant.price : product.price}
+                </span>
+              ))}
             <span className="ml-3 bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">
               On sale for a limited time
             </span>
           </div>
 
-          <div className="flex items-center mb-6">
+          <div className="flex items-center">
             <span className="text-yellow-500 text-lg">★★★★★</span>
             <span className="ml-3 text-gray-600">(132 Reviews)</span>
           </div>
 
           {product.type === "variable" && product.attributes && (
-            <div className="mb-4 bg-background">
-              {product.attributes.map((attribute) => {
-                return (
-                  <div key={attribute.id} className=" flex flex-col gap-2 mt-4">
-                    <span>{attribute.name}*</span>
-                    <Select
-                      onValueChange={(item) => handleAttributeChange(attribute.name, item)}
-                      value={selectedAttributes[attribute.name]}
+            <div className="flex flex-col gap-3 mt-4">
+              {errors && <span className="text-sm text-red-500">{errors}</span>}
+              <div className="mb-4 bg-background mt-4">
+                {product.attributes.map((attribute) => {
+                  return (
+                    <div
+                      key={attribute.id}
+                      className=" flex flex-col gap-2"
                     >
-                      <SelectTrigger className="">
-                        <SelectValue placeholder={`Select ${attribute.name}`} />
-                      </SelectTrigger>
-                      <SelectContent className="">
-                        <SelectGroup>
-                          {attribute.values.map((value, index) => {
-                            const isAvailable = variants.every(
-                                (variant) =>
+                      <span>{attribute.name}*</span>
+                      <Select
+                        onValueChange={(item) =>
+                          handleAttributeChange(attribute.name, item)
+                        }
+                        value={selectedAttributes[attribute.name]}
+                      >
+                        <SelectTrigger
+                          className={errors ? "border-red-500" : ""}
+                        >
+                          <SelectValue
+                            placeholder={`Select ${attribute.name}`}
+                          />
+                        </SelectTrigger>
+                        <SelectContent className="">
+                          <SelectGroup>
+                            {attribute.values.map((value, index) => {
+                              const isAvailable = variants.every((variant) =>
                                   !variant.attributes.some(
                                     (attr) =>
                                       attr.name === attribute.name &&
                                       attr.value === value
                                   )
-                              )
-                            return (
-                              <SelectItem disabled={isAvailable} key={index} value={value}>
-                                <Button
+                              );
+                              console.log("isAvailable: ", isAvailable);
+                              return (
+                                <SelectItem
                                   disabled={isAvailable}
-                                  variant="ghost"
+                                  key={index}
+                                  value={value}
                                 >
-                                  {value}
-                                </Button>
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    {/* <CustomSelect
+                                  {/* {value} {isAvailable && <span className="text-xs text-red-500">nicht vorrätig</span>} */}
+                                  {value}{" "}
+                                  {isAvailable && (
+                                    <span className="text-xs text-red-500 ml-3">
+                                      {"(Out of stock)"}
+                                    </span>
+                                  )}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {/* <CustomSelect
                         width="w-full"
                         selected={attribute.values[0]}
                         items={attribute.values}
                         onChange={(e) => console.log(e)}
                     /> */}
-                  </div>
-                );
-              })}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
           {product.personalisable && (
             <div className=" flex flex-col gap-2 mt-4">
               <span>Add your personalisation*</span>
-              <span>Enter your desired text. Example: Mom</span>
+              <span className="text-sm text-muted-foreground">
+                Enter your desired text. Example: Mom
+              </span>
               <Textarea
+                className={errors ? "border-red-500" : ""}
                 value={personalisation}
-                onChange={(e) => setPersonalisation(e.target.value)}
+                onChange={(e) => {
+                  setPersonalisation(e.target.value);
+                  setErrors("");
+                }}
               />
             </div>
           )}
 
           {/* Add to Cart Button */}
-          <button className="w-full bg-red-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-red-700 transition">
-            Add to Cart
-          </button>
+          <div className="w-full mt-6">
+            {product.type === "simple" && <AddToCart product={orderItem} />}
+            {product.type === "variable" && 
+            <>
+              {selectedVariant ? <AddToCart product={orderItem} /> : 
+              <Button onClick={handleErrors} className="w-full  md:w-[180px]">
+                <span>Add to Cart</span>
+              </Button>}
+              </>
+            }
+          </div>
         </div>
       </div>
-      <div className=" flex flex-col lg:grid lg:grid-cols-3 lg:gap-3">
-        <div className="lg:col-span-2">
-          <div>
-            {product && (
-              <ImageViewer images={product.images} details={product.name} />
-            )}
-          </div>
-
-          {/* <div className=" hidden lg:flex mt-10">
-            <ProductReviews
-              rating={product.rating}
-              reviews={product.numReviews}
-            />
-          </div> */}
-        </div>
-
-        <div className=" lg:col-span-1">
-          <ProductDetails product={product} />
-          {/* <div className=" py-6 flex lg:hidden">
-            <ProductReviews
-              rating={product.rating}
-              reviews={product.numReviews}
-            />
-          </div> */}
-        </div>
+      <div className=" flex flex-col my-10 gap-6">
+        <ProductDetails product={product} />
+        <ProductReviews
+          rating={product.rating as number}
+          reviews={product.reviews as number}
+        />
       </div>
     </div>
   );

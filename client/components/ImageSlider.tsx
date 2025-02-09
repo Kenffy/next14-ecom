@@ -22,7 +22,7 @@ export const ImageSlider: FC<ImageSliderProps> = ({ images }) => {
   return (
     <div className="relative">
       <div className="flex flex-col-reverse md:flex-row gap-2">
-        <div className="hide-scrollbar whitespace-nowrap flex gap-3 h-20 flex-row items-center overscroll-x-auto md:flex-col overflow-y-auto md:h-[480px] lg:h-[520px] md:w-20">
+        <div className="hide-scrollbar whitespace-nowrap flex gap-2 h-20 flex-row items-center overscroll-x-auto md:flex-col overflow-y-auto md:h-[480px] lg:h-[520px] md:w-20">
           {images &&
             images.map((img, index) => (
               <button
@@ -30,7 +30,7 @@ export const ImageSlider: FC<ImageSliderProps> = ({ images }) => {
                 onMouseOver={() => handleActiveImage(index)}
                 onClick={() => handleActiveImage(index)}
                 className={`flex-none w-16 h-16 rounded-lg overflow-hidden border-2 ${
-                  activeImage === index ? "border-red-600" : "border-gray-300"
+                  activeImage === index ? "border-foreground" : "border-background"
                 }`}
               >
                 <Image
