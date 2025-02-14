@@ -14,9 +14,9 @@ import { formatCurrency } from "@/lib/formatters";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { CartSummary } from "./cart-summary";
+import { Trash } from "lucide-react";
 
-interface CartPageProps {
-}
+interface CartPageProps {}
 
 export const CartDetailsPage: FC<CartPageProps> = (props) => {
   const cart = useCartService();
@@ -27,6 +27,18 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
 
   const handleDecrement = (item: OrderItem) => {
     cart.decrease(item);
+  };
+
+  const computeCurrentPrice = (item: OrderItem) => {
+    return item.discount && item.discount > 0
+      ? item.qty * (item.price - item.price * item.discount * 0.01)
+      : item.qty * item.price;
+  };
+
+  const computeDiscountPrice = (item: OrderItem) => {
+    return item.discount && item.discount > 0
+      ? item.qty * (item.price - item.price * item.discount * 0.01)
+      : 0;
   };
 
   return (
@@ -49,19 +61,24 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                 <Image
                   src={item.image.url}
                   alt={item.slug}
-                  width={250}
-                  height={250}
-                  className=" flex-none w-[60px] h-[60px] md:w-[80px] md:h-[80px] lg:w-[110px] lg:h-[110px] rounded-md object-cover object-center cursor-pointer"
+                  width={120}
+                  height={120}
+                  className=" flex-none w-[70px] h-[70px] md:w-[80px] md:h-[80px] lg:w-[110px] lg:h-[110px] rounded-md object-cover object-center cursor-pointer"
                 />
 
                 <div className=" grow flex flex-col gap-1 md:gap-2 pl-2 md:pl-4">
-                  <h1 className=" w-[90%] text-sm font-bold md:text-xl line-clamp-1 ">
+                  <h1 className=" w-full text-sm font-semibold md:text-xl line-clamp-2 ">
                     {item.name}
                   </h1>
-                  <div className="">
+                  <div className="flex gap-4">
                     <span className=" text-md md:text-xl font-semibold">
-                      {formatCurrency(item.price * item.qty)}
+                      {formatCurrency(computeCurrentPrice(item))}
                     </span>
+                    {item?.discount && item.discount > 0 && (
+                      <span className=" line-through text-red-600">
+                        {formatCurrency(item.price)}
+                      </span>
+                    )}
                   </div>
                   {/* <div className=" flex items-center gap-4">
                     <span className=" text-sm">
@@ -73,47 +90,56 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                   </div> */}
 
                   <div className=" flex items-center gap-2 md:gap-4">
-                    <div className=" w-full flex items-center justify-between">
-                      <div className="flex items-center">
-                        <span className=" text-sm md:text-md">{`${
-                          item.qty
-                        }x${formatCurrency(item.price)}`}</span>
-                        {/* <select className=" bg-transparent outline-none p-1 border rounded-md overflow-hidden">
-                      {[...Array(20)].map((item, index) => (
-                        <option className=" text-black" key={index + 1}>
-                          {index + 1}
-                        </option>
-                      ))}
-                    </select> */}
+                    <div className=" w-full flex gap-2 flex-col items-end sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className=" text-sm md:text-md">
+                          {`${item.qty}x${
+                            item.discount && item.discount > 0
+                              ? formatCurrency(computeDiscountPrice(item))
+                              : formatCurrency(item.price)
+                          }`}
+                        </span>
 
-                        <div className=" w-fit ml-4 flex items-center border-[2px] border-white/20 rounded-md overflow-hidden">
+                        {item.attributes && item.attributes.length > 0 && (
+                          <div className="flex items-center">
+                            <span className=" text-muted-foreground text-sm">
+                              {item.attributes
+                                .map((attr) => attr.value)
+                                .join(", ")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className=" text-sm w-fit ml-4 flex items-center border-[2px] border-white/20 rounded-md overflow-hidden">
                           <Button
                             variant="outline"
                             onClick={() => handleDecrement(item)}
-                            className=" text-xl h-[30px] w-[30px] cursor-pointer "
+                            className=" h-[30px] w-[30px] cursor-pointer "
                           >
                             -
                           </Button>
-                          <div className=" flex items-center justify-center h-[30px] w-[30px]">
+                          <div className=" flex items-center justify-center px-2">
                             <span className=" text-center">{item.qty}</span>
                           </div>
                           <Button
                             variant="outline"
                             onClick={() => handleIncrement(item)}
-                            className=" text-xl h-[30px] w-[30px] cursor-pointer"
+                            className=" h-[30px] w-[30px] cursor-pointer"
                           >
                             +
                           </Button>
                         </div>
+                        <Button
+                          onClick={() => cart.remove(item)}
+                          variant="ghost"
+                          className=" h-[30px] px-2 flex items-center justify-center gap-1 bg-red-100/80 text-red-600/50 hover:bg-red-100 hover:text-red-600"
+                        >
+                          <Trash size={15} />
+                          <span className=" hidden md:block">remove</span>
+                        </Button>
                       </div>
-                      <Button
-                        onClick={() => cart.remove(item)}
-                        variant="destructive"
-                        className=" h-[30px] px-2 flex items-center justify-center gap-1"
-                      >
-                        <MdClose size={15} />
-                        <span className=" hidden md:block">remove</span>
-                      </Button>
                     </div>
                   </div>
                 </div>
@@ -160,4 +186,4 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
       </div>
     </div>
   );
-}
+};

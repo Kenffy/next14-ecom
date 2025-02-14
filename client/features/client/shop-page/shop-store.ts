@@ -34,7 +34,7 @@ class ShopState {
   }) {
     this.productData = products;
     this.categories = categories;
-    this.filterCategory = this.categories[0].name;
+    this.filterCategory = this.categories[0]?.name;
   }
 
   private getCategoryIdOrName(category: string) {

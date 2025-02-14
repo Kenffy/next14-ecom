@@ -51,7 +51,10 @@ export default function useCartService() {
     const updatedCartItems = exist
       ? items.map((x) =>
           x.slug === item.slug && (!item.variable || x.variantId === item.variantId)
-            ? { ...exist, qty: exist.qty + 1 }
+            ? { ...exist, 
+                qty: exist.qty + 1, 
+                personalisation: x.personalisation !== item.personalisation ? item.personalisation : x.personalisation 
+              }
             : x
         )
       : [...items, { ...item, qty: 1 }];
@@ -67,7 +70,10 @@ export default function useCartService() {
         ? items.filter((x) => x.slug !== item.slug || (item.variable && x.variantId !== item.variantId))
         : items.map((x) =>
             x.slug === item.slug && (!item.variable || x.variantId === item.variantId)
-              ? { ...exist, qty: exist.qty - 1 }
+              ? { ...exist, 
+                  qty: exist.qty - 1, 
+                  personalisation: x.personalisation !== item.personalisation ? item.personalisation : x.personalisation
+                }
               : x
           );
     updateCart(updatedCartItems);
@@ -121,162 +127,12 @@ export default function useCartService() {
 }
 
 const calcPrice = (items: OrderItem[]) => {
-  const itemsPrice = round2(items.reduce((acc, item) => acc + item.price * item.qty, 0));
+  const itemsPrice = round2(items.reduce((acc, item) => 
+    (item.discount && item.discount > 0) ? ((acc + (item.price - ((item.price * item.discount)/100)) * item.qty)) : 
+    ((acc + item.price * item.qty)), 0));
+  const itemPriceWithoutTax = round2(itemsPrice - (0.19 * itemsPrice));
   const shippingPrice = 0;
   const taxPrice = round2(0.19 * itemsPrice);
-  const totalPrice = round2(itemsPrice + shippingPrice + taxPrice);
-  return { itemsPrice, shippingPrice, taxPrice, totalPrice };
+  //const totalPrice = round2(itemsPrice + shippingPrice + taxPrice);
+  return { itemsPrice: itemPriceWithoutTax, shippingPrice, taxPrice, totalPrice: itemsPrice };
 };
-
-
-// const initialState: Cart = {
-//   items: [],
-//   itemsPrice: 0,
-//   taxPrice: 0,
-//   shippingPrice: 0,
-//   totalPrice: 0,
-//   paymentMethod: "PayPal",
-//   shippingAddress: {
-//     street: "",
-//     city: "",
-//     state: "",
-//     postalCode: "",
-//     country: "",
-//   },
-// };
-
-// export const cartStore = create<Cart>()(
-//   persist(() => initialState, {
-//     name: "cartStore",
-//   })
-// );
-
-// export default function useCartService() {
-//   const {
-//     items,
-//     itemsPrice,
-//     taxPrice,
-//     shippingPrice,
-//     totalPrice,
-//     paymentMethod,
-//     shippingAddress,
-//   } = cartStore();
-
-//   return {
-//     items,
-//     itemsPrice,
-//     taxPrice,
-//     shippingPrice,
-//     totalPrice,
-//     paymentMethod,
-//     shippingAddress,
-
-//     increase: (item: OrderItem) => {
-//       const exist = item.variable ? 
-//           items.find((x)=> x.slug === item.slug && (x.variable && item.variable && x.variantId === item.variantId)): 
-//           items.find((x) => x.slug === item.slug);
-
-//       const updatedCartItems = exist? 
-//         exist.variable ? 
-//           items.map((x) => (x.slug === item.slug && x.variantId === item.variantId) ? { ...exist, qty: exist.qty + 1 } : x):
-//           items.map((x) => x.slug === item.slug ? { ...exist, qty: exist.qty + 1 } : x)
-//         : [...items, { ...item, qty: 1 }];
-//       const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
-//         calcPrice(updatedCartItems);
-//       cartStore.setState({
-//         items: updatedCartItems,
-//         itemsPrice,
-//         shippingPrice,
-//         taxPrice,
-//         totalPrice,
-//       });
-//     },
-
-//     decrease: (item: OrderItem) => {
-//       const exist = item.variable ? 
-//           items.find((x)=> x.slug === item.slug && (x.variable && item.variable && x.variantId === item.variantId)): 
-//           items.find((x) => x.slug === item.slug);
-//       if (!exist) return;
-//       const updatedCartItems = exist.qty === 1 ?
-//         item.variable ? 
-//           items.filter((x) => x.slug !== item.slug && x.variantId !== item.variantId):
-//           items.filter((x) => x.slug !== item.slug)
-//           : item.variable ?
-//            items.map((x) => (x.slug === item.slug && x.variantId === item.variantId) ? { ...exist, qty: exist.qty - 1 } : x):
-//            items.map((x) => x.slug === item.slug ? { ...exist, qty: exist.qty - 1 } : x);
-
-//       const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
-//         calcPrice(updatedCartItems);
-//       cartStore.setState({
-//         items: updatedCartItems,
-//         itemsPrice,
-//         shippingPrice,
-//         taxPrice,
-//         totalPrice,
-//       });
-//     },
-
-//     remove: (item: OrderItem) => {
-//       const exist = item.variable ? 
-//           items.find((x)=> x.slug === item.slug && (x.variable && item.variable && x.variantId === item.variantId)): 
-//           items.find((x) => x.slug === item.slug);
-
-//       if (!exist) return;
-
-//       const updatedCartItems = item.variable ? 
-//       items.filter((x) => x.slug !== item.slug && x.variantId !== item.variantId) : 
-//       items.filter((x) => x.slug !== item.slug);
-//       const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
-//         calcPrice(updatedCartItems);
-//       cartStore.setState({
-//         items: updatedCartItems,
-//         itemsPrice,
-//         shippingPrice,
-//         taxPrice,
-//         totalPrice,
-//       });
-//     },
-
-//     clearCart: () => {
-//       const updatedCartItems: OrderItem[] = [];
-//       const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
-//         calcPrice(updatedCartItems);
-//       cartStore.setState({
-//         items: updatedCartItems,
-//         itemsPrice,
-//         shippingPrice,
-//         taxPrice,
-//         totalPrice,
-//       });
-//     },
-
-//     saveShippingAddrress: (shippingAddress: AddressModel) => {
-//       cartStore.setState({
-//         shippingAddress,
-//       });
-//     },
-//     savePaymentMethod: (paymentMethod: string) => {
-//       cartStore.setState({
-//         paymentMethod,
-//       });
-//     },
-
-//     clear: () => {
-//       cartStore.setState({
-//         items: [],
-//       });
-//     },
-
-//     init: () => cartStore.setState(initialState),
-//   };
-// }
-
-// const calcPrice = (items: OrderItem[]) => {
-//   const itemsPrice = round2(
-//       items.reduce((acc, item) => acc + item.price * item.qty, 0)
-//     ),
-//     shippingPrice = 0,
-//     taxPrice = round2(Number(0.19 * itemsPrice)),
-//     totalPrice = round2(itemsPrice + shippingPrice + taxPrice);
-//   return { itemsPrice, shippingPrice, taxPrice, totalPrice };
-// };

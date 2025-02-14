@@ -81,16 +81,28 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
   };
 
   const handleErrors = () => {
-    if (product.type === "variable" && !selectedVariant || !personalisation) {
-      // const attributes = product.attributes && product.attributes?.length > 0
-      //   ? product.attributes.map((attr) => attr.name).join(", ")
-      //   : "all attributes";
+    if (product.type === "variable" && (!selectedVariant || (product.personalisable && !personalisation))) {
       const message = `Please select fill all the required fields to continue`;
       setErrors(message);
     }
   };
 
-  console.log("selectedVariant: ", selectedVariant);
+
+  const isVariantInStock = (choices: { [key: string]: string }) => {
+    return variants.some((variant) => {
+      const variantAttribures = variant.attributes;
+      if (!variantAttribures) return false;
+
+      return (
+        Object.entries(choices).every(
+          ([key, value]) => variantAttribures.some((attr) => attr.name === key && attr.value === value)
+        ) &&
+        variant.inventory?.status !== "out_of_stock" &&
+        variant.inventory?.quantity &&
+        variant.inventory?.quantity > 0
+      );
+    });
+  };
 
   const orderItem: OrderItem = {
     name: product.name,
@@ -131,18 +143,18 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
               €
               {selectedVariant
                 ? (selectedVariant.discount as number) > 0
-                  ? selectedVariant.discount
+                  ? product.price - (selectedVariant.discount as number/100) * product.price
                   : selectedVariant.price
                 : (product.discount as number) > 0
-                ? product.discount
+                ? product.price - (product.discount as number/100) * product.price
                 : product.price}
             </span>
             {(selectedVariant?.discount as number) > 0 ||
-              ((product?.discount as number) > 0 && (
+              (product?.discount as number) > 0 && (
                 <span className="line-through ml-3 text-gray-500">
                   €{selectedVariant ? selectedVariant.price : product.price}
                 </span>
-              ))}
+              )}
             <span className="ml-3 bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">
               On sale for a limited time
             </span>
@@ -171,7 +183,7 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
                         value={selectedAttributes[attribute.name]}
                       >
                         <SelectTrigger
-                          className={errors ? "border-red-500" : ""}
+                          className={(errors && !selectedVariant) ? "border-red-500 not-allowed" : ""}
                         >
                           <SelectValue
                             placeholder={`Select ${attribute.name}`}
@@ -180,17 +192,20 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
                         <SelectContent className="">
                           <SelectGroup>
                             {attribute.values.map((value, index) => {
-                              const isAvailable = variants.every((variant) =>
-                                  !variant.attributes.some(
-                                    (attr) =>
-                                      attr.name === attribute.name &&
-                                      attr.value === value
-                                  )
-                              );
-                              console.log("isAvailable: ", isAvailable);
+                              // const isAvailable = variants.every((variant) =>
+                              //     !variant.attributes.some(
+                              //       (attr) =>
+                              //         attr.name === attribute.name &&
+                              //         attr.value === value
+                              //     )
+                              // );
+                              const isAvailable = !isVariantInStock({
+                                ...selectedAttributes,
+                                [attribute.name]: value,
+                              });
                               return (
                                 <SelectItem
-                                  disabled={isAvailable}
+                                  //disabled={isAvailable}
                                   key={index}
                                   value={value}
                                 >
@@ -227,7 +242,7 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
                 Enter your desired text. Example: Mom
               </span>
               <Textarea
-                className={errors ? "border-red-500" : ""}
+                className={(errors && !personalisation) ? "border-red-500" : ""}
                 value={personalisation}
                 onChange={(e) => {
                   setPersonalisation(e.target.value);
@@ -242,7 +257,7 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
             {product.type === "simple" && <AddToCart product={orderItem} />}
             {product.type === "variable" && 
             <>
-              {selectedVariant ? <AddToCart product={orderItem} /> : 
+              {((selectedVariant && !product.personalisable) || (selectedVariant && product.personalisable && personalisation)) ? <AddToCart product={orderItem} /> : 
               <Button onClick={handleErrors} className="w-full  md:w-[180px]">
                 <span>Add to Cart</span>
               </Button>}
