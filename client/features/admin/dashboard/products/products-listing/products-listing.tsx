@@ -58,7 +58,7 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
         <CustomHero
           title={
             <>
-              <Package size={26} strokeWidth={1.5} /> {product.name}
+              <Package size={26} strokeWidth={1.5} className="flex-none"/> {product.name}
             </>
           }
           actionTitle="Add Product Variant"
@@ -69,7 +69,7 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
         ></CustomHero>
         <div className="container max-w-5xl py-6 px-4 md:px-8 mx-auto">
           <div className="flex flex-none gap-4">
-            <div className="w-60 h-64 overflow-hidden rounded-sm bg-muted/50">
+            <div className="w-60 h-64 flex-none overflow-hidden rounded-sm bg-muted/50">
               <Image
                 src={productImageUrl}
                 alt={product.name}
@@ -80,7 +80,7 @@ export const AdminProductListing: FC<AdminProductListingProps> = (props) => {
             </div>
             <div className="flex flex-grow rounded-sm bg-muted/50 p-4">
               <div className="flex flex-col gap-2">
-                <div className="w-full flex items-center gap-2">
+                <div className="w-full flex flex-col gap-2">
                   <span className="font-semibold">Description:</span>
                   <p>{product.description}</p>
                 </div>
