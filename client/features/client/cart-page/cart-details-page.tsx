@@ -15,6 +15,7 @@ import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { CartSummary } from "./cart-summary";
 import { Trash } from "lucide-react";
+import { computeCurrentPrice, computeDiscountPrice } from "@/lib/utils";
 
 interface CartPageProps {}
 
@@ -27,18 +28,6 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
 
   const handleDecrement = (item: OrderItem) => {
     cart.decrease(item);
-  };
-
-  const computeCurrentPrice = (item: OrderItem) => {
-    return item.discount && item.discount > 0
-      ? item.qty * (item.price - item.price * item.discount * 0.01)
-      : item.qty * item.price;
-  };
-
-  const computeDiscountPrice = (item: OrderItem) => {
-    return item.discount && item.discount > 0
-      ? item.qty * (item.price - item.price * item.discount * 0.01)
-      : 0;
   };
 
   return (
@@ -71,7 +60,7 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                     {item.name}
                   </h1>
                   <div className="flex gap-4">
-                    <span className=" text-md md:text-xl font-semibold">
+                    <span className=" text-xl md:text-2xl font-semibold">
                       {formatCurrency(computeCurrentPrice(item))}
                     </span>
                     {item?.discount && item.discount > 0 && (
@@ -94,7 +83,7 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                       <div className="flex items-center gap-3">
                         <span className=" text-sm md:text-md">
                           {`${item.qty}x${
-                            item.discount && item.discount > 0
+                            (item.discount && item.discount > 0)
                               ? formatCurrency(computeDiscountPrice(item))
                               : formatCurrency(item.price)
                           }`}

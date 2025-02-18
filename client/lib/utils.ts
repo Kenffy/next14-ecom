@@ -1,3 +1,4 @@
+import { OrderItem } from "@/schemas/models";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -19,4 +20,15 @@ export const formatNumber = (x: number) => {
 
 export const formatId = (x: string) => {
   return `..${x.substring(20, 24)}`;
+};
+
+export const computeCurrentPrice = (item: OrderItem) => {
+  return item.discount && item.discount > 0
+    ? item.qty * (item.price - (item.price * item.discount * 0.01))
+    : item.qty * item.price;
+};
+
+export const computeDiscountPrice = (item: OrderItem) => {
+  const discount = item?.discount as number;
+  return item.price - (item.price * discount * 0.01);
 };
