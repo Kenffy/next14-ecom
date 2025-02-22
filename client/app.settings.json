@@ -1,0 +1,66 @@
+{
+  "languages": [
+    {
+      "name": "English",
+      "code": "en"
+    },
+    {
+      "name": "Deutsch",
+      "code": "de"
+    },
+    {
+      "name": "Français",
+      "code": "fr"
+    }
+  ],
+  "currencies": [
+    {
+      "name": "EUR",
+      "symbol": "€",
+      "position": "right",
+      "decimals": 2,
+      "decimalPoint": ",",
+      "thousandSeparator": "."
+    },
+    {
+      "name": "USD",
+      "symbol": "$",
+      "position": "left",
+      "decimals": 2,
+      "decimalPoint": ".",
+      "thousandSeparator": ","
+    },
+    {
+      "name": "GBP",
+      "symbol": "£",
+      "position": "left",
+      "decimals": 2,
+      "decimalPoint": ".",
+      "thousandSeparator": ","
+    }
+  ],
+  "defaultShopsettings": {
+    "shopDiscount": 0,
+    "shopTax": 19,
+    "shopCurrency": {
+      "name": "EUR",
+      "symbol": "€",
+      "position": "right",
+      "decimals": 2,
+      "decimalPoint": ",",
+      "thousandSeparator": "."
+    }
+  },
+  "shopSettings": {
+    "shopDiscount": 15,
+    "shopTax": 19,
+    "shopCurrency": {
+      "name": "EUR",
+      "symbol": "€",
+      "position": "right",
+      "decimals": 2,
+      "decimalPoint": ",",
+      "thousandSeparator": "."
+    }
+  }
+}
