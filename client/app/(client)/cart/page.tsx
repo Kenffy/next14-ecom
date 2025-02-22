@@ -1,9 +1,5 @@
-import { DisplayError } from "@/components/ui/error/display-error";
-import { GetCategoriesAsync } from "@/features/admin/dashboard/categories/category-service";
-import { GetBaseProductsAsync } from "@/features/admin/dashboard/products/product-service";
 import { CartPage } from "@/features/client/cart-page/cart-page";
-import { ShopPage } from "@/features/client/shop-page/shop-page";
-import { BaseProductModel, CategoryModel } from "@/schemas/models";
+import { GetAppSettings } from "@/lib/app-settings";
 import React from "react";
 
 export const metadata = {
@@ -12,11 +8,10 @@ export const metadata = {
 };
 
 export default async function Cart() {
-
-
+  const appSettings = await GetAppSettings();
   return (
     <main className="flex min-h-screen">
-      <CartPage />
+      <CartPage settings={appSettings}/>
     </main>
   );
 }

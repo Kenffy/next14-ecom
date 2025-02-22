@@ -1,5 +1,6 @@
 "use client";
 import CheckoutAuthOptions from "@/components/CheckoutAuthOptions";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/formatters";
@@ -12,6 +13,7 @@ interface CartSummaryProps {
 
 export const CartSummary: FC<CartSummaryProps> = ({cart}) => {
   const [open, setOpen] = useState<boolean>(false);
+  console.log("current cart: ", cart)
   return (
     <div className=" flex flex-col gap-2 py-4 mt-4">
       <Separator />
@@ -19,14 +21,45 @@ export const CartSummary: FC<CartSummaryProps> = ({cart}) => {
         <span>{`Item(s) total:`}</span>
         <span>{formatCurrency(cart.itemsPrice)}</span>
       </div>
+      {(cart.itemsDiscountPrice > 0 || cart.shopDiscountPrice || cart.couponDiscountPrice) &&
       <div className=" text-md font-semibold flex items-center justify-between">
-        <span>{`Shop discount:`}</span>
-        <span>{`-`}</span>
-      </div>
-      <Separator />
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="discount-total">
+            <AccordionTrigger className="py-1">
+              <div className="flex items-center justify-between w-full font-semibold">
+                <span>Discount total:</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="flex flex-col gap-1">
+              {cart.itemsDiscountPrice > 0 && 
+              <div className="text-xs font-normal flex items-center justify-between">
+                <span>Items discount:</span>
+                <span className=" text-muted-foreground">-{formatCurrency(cart.itemsDiscountPrice)}</span>
+              </div>
+              }
+              {cart.shopDiscountPrice > 0 &&
+              <div className="text-xs font-normal flex items-center justify-between">
+                <span>Shop discount:</span>
+                <span className=" text-muted-foreground">-{formatCurrency(cart.shopDiscountPrice)}</span>
+              </div>
+              }
+              {cart.couponDiscountPrice > 0 &&
+              <div className="text-xs font-normal flex items-center justify-between">
+                <span>Coupon code:</span>
+                <span className=" text-muted-foreground">-{formatCurrency(cart.couponDiscountPrice)}</span>
+              </div>
+              }
+              <div className="text-xs font-normal flex items-center justify-between">
+                <span>You save:</span>
+                <span className=" text-green-400">{formatCurrency(cart.totalDiscountPrice)}</span>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>}
       <div className=" text-sm flex items-center justify-between">
         <span>Subtotal:</span>
-        <span>{formatCurrency(cart.itemsPrice)}</span>
+        <span>{formatCurrency(cart.subTotalPrice)}</span>
       </div>
       <div className=" text-sm flex items-center justify-between">
         <span>Tax:</span>
@@ -36,7 +69,7 @@ export const CartSummary: FC<CartSummaryProps> = ({cart}) => {
         <span>Shipping:</span>
         <span>
           {cart.shippingPrice > 0
-            ? `${formatCurrency(cart.shippingPrice)} €`
+            ? `${formatCurrency(cart.shippingPrice)}`
             : `Free`}
         </span>
       </div>

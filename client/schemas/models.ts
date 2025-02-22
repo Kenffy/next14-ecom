@@ -131,11 +131,20 @@ export type OrderItem = {
 };
 
 export type Cart = {
+  shopTax: number; // in percentage
+  shopDiscount: number; // in percentage
+  couponCode: string;
+  couponDiscount: number; // in percentage
   items: OrderItem[];
   itemsPrice: number;
   taxPrice: number;
   shippingPrice: number;
+  subTotalPrice: number;
   totalPrice: number;
+  itemsDiscountPrice: number;
+  shopDiscountPrice: number;
+  couponDiscountPrice: number;
+  totalDiscountPrice: number;
   paymentMethod: string;
   shippingAddress: AddressModel;
 };

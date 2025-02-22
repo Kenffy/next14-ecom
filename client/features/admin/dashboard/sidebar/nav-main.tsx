@@ -34,11 +34,11 @@ const MainLinks = [
     url: "/dashboard/users",
     icon: Users,
   },
-  // {
-  //   title: "Settings",
-  //   url: "/dashboard/settings",
-  //   icon: Settings,
-  // },
+  {
+    title: "Settings",
+    url: "/dashboard/settings",
+    icon: Settings,
+  },
 ]
 
 const OtherLinks = [

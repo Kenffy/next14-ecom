@@ -1,9 +1,8 @@
 "use client";
-import { BsBagXFill } from "react-icons/bs";
-import { MdClose } from "react-icons/md";
+
 import { BiSolidCoupon } from "react-icons/bi";
 import Image from "next/image";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import PaymentSelect from "@/components/PaymentSelect";
 import useCartService from "@/hooks/useCartStore";
 import { Input } from "@/components/ui/input";
@@ -17,10 +16,19 @@ import { CartSummary } from "./cart-summary";
 import { Trash } from "lucide-react";
 import { computeCurrentPrice, computeDiscountPrice } from "@/lib/utils";
 
-interface CartPageProps {}
+interface CartPageProps {
+  settings: any;
+}
 
 export const CartDetailsPage: FC<CartPageProps> = (props) => {
+  const { settings } = props;
   const cart = useCartService();
+
+  useEffect(() => {
+    if (props.settings) {
+      cart.updateShopSettings(settings.shopSettings.shopDiscount, settings.shopSettings.shopTax);
+    }
+  }, [settings]);
 
   const handleIncrement = (item: OrderItem) => {
     cart.increase(item);
@@ -170,7 +178,7 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
 
         <div className="col-span-1 mt-6 md:mt-0 px-2 md:pl-4 flex flex-col gap-2">
           <PaymentSelect />
-          <CartSummary cart={cart} />
+          <CartSummary cart={cart}/>
         </div>
       </div>
     </div>
