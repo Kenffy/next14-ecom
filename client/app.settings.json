@@ -52,7 +52,7 @@
     }
   },
   "shopSettings": {
-    "shopDiscount": 15,
+    "shopDiscount": 5,
     "shopTax": 19,
     "shopCurrency": {
       "name": "EUR",

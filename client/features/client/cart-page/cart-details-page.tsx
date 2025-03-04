@@ -67,24 +67,16 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                   <h1 className=" w-full text-sm font-semibold md:text-xl line-clamp-2 ">
                     {item.name}
                   </h1>
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 items-center">
                     <span className=" text-xl md:text-2xl font-semibold">
                       {formatCurrency(computeCurrentPrice(item))}
                     </span>
-                    {item?.discount && item.discount > 0 && (
-                      <span className=" line-through text-red-600">
-                        {formatCurrency(item.price)}
-                      </span>
-                    )}
+
+                    <div className="bg-red-100 text-red-600 px-2 rounded-full text-sm">
+                    {(item?.discount && item.discount > 0) ? `-${item.discount}%`: ''}
+                    </div>
+                    
                   </div>
-                  {/* <div className=" flex items-center gap-4">
-                    <span className=" text-sm">
-                      <b>Color:</b> {item.color}
-                    </span>
-                    <span className=" text-sm">
-                      <b>Size:</b> {item.size}
-                    </span>
-                  </div> */}
 
                   <div className=" flex items-center gap-2 md:gap-4">
                     <div className=" w-full flex gap-2 flex-col items-end sm:flex-row sm:items-center sm:justify-between">
@@ -96,8 +88,12 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                               : formatCurrency(item.price)
                           }`}
                         </span>
-
-                        {item.attributes && item.attributes.length > 0 && (
+                        
+                        <span className=" line-through text-sm md:text-md text-muted-foreground">
+                          {(item.discount && item.discount > 0) ? `${item.qty}x${formatCurrency(item.price)}` : ''}
+                        </span>
+                        
+                        {(item.attributes && item.attributes.length > 0) && 
                           <div className="flex items-center">
                             <span className=" text-muted-foreground text-sm">
                               {item.attributes
@@ -105,7 +101,7 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                                 .join(", ")}
                             </span>
                           </div>
-                        )}
+                        }
                       </div>
 
                       <div className="flex items-center gap-3">

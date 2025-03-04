@@ -24,6 +24,8 @@ import {
 import ProductReviews from "@/components/product/Reviews";
 import { AddToCart } from "./add-cart";
 import { Button } from "@/components/ui/button";
+import { format } from "path";
+import { formatCurrency } from "@/lib/formatters";
 
 interface ProductPageProps {
   product: ProductModel;
@@ -62,8 +64,19 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
     return selectedVariant ? selectedVariant.price : product.price;
   };
 
-  const getProductDiscountPrice = () => {
+  const getProductDiscount = () => {
     return selectedVariant ? selectedVariant.discount : product.discount;
+  };
+
+  const computeCurrentPrice = () => {
+    return selectedVariant
+      ? (selectedVariant.discount as number) > 0
+        ? product.price -
+          ((selectedVariant.discount as number) * 0.01) * product.price
+        : selectedVariant.price
+      : (product.discount as number) > 0
+      ? product.price - ((product.discount as number) * 0.01) * product.price
+      : product.price;
   };
 
   const getProductImage = () => {
@@ -108,7 +121,7 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
     name: product.name,
     slug: product.slug as string,
     price: getProductPrice(),
-    discount: getProductDiscountPrice(),
+    discount: getProductDiscount(),
     productId: product._id!,
     image: getProductImage() as FileModel,
     personalisable: product.personalisable as boolean,
@@ -138,26 +151,22 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
           <h1 className="text-2xl lg:text-4xl font-bold mb-2">
             {product.name}
           </h1>
-          <div className="flex items-center mb-4">
-            <span className="text-3xl font-bold">
-              €
-              {selectedVariant
-                ? (selectedVariant.discount as number) > 0
-                  ? product.price - (selectedVariant.discount as number/100) * product.price
-                  : selectedVariant.price
-                : (product.discount as number) > 0
-                ? product.price - (product.discount as number/100) * product.price
-                : product.price}
-            </span>
-            {(selectedVariant?.discount as number) > 0 ||
-              (product?.discount as number) > 0 && (
-                <span className="line-through ml-3 text-gray-500">
-                  €{selectedVariant ? selectedVariant.price : product.price}
-                </span>
-              )}
-            <span className="ml-3 bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">
-              On sale for a limited time
-            </span>
+          <div className="flex flex-col gap-2 md:flex-row justify-start items-center mb-4">
+            <div className="w-full flex items-center gap-2">
+              <span className="text-3xl font-bold">
+                {formatCurrency(computeCurrentPrice())}
+              </span>
+              {(selectedVariant?.discount as number) > 0 ||
+                (product?.discount as number) > 0 && (
+                  <span className="line-through ml-3 text-gray-500">
+                    €{selectedVariant ? selectedVariant.price : product.price}
+                  </span>
+                )}
+              <span className="ml-3 bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">
+                On sale for a limited time
+              </span>
+            </div>
+            <span className="w-full text-foreground-muted text-xs">{`VAT included (where applicable)`}</span>
           </div>
 
           <div className="flex items-center">
@@ -192,13 +201,6 @@ export const ProductPage: FC<ProductPageProps> = (props) => {
                         <SelectContent className="">
                           <SelectGroup>
                             {attribute.values.map((value, index) => {
-                              // const isAvailable = variants.every((variant) =>
-                              //     !variant.attributes.some(
-                              //       (attr) =>
-                              //         attr.name === attribute.name &&
-                              //         attr.value === value
-                              //     )
-                              // );
                               const isAvailable = !isVariantInStock({
                                 ...selectedAttributes,
                                 [attribute.name]: value,

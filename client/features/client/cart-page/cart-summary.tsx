@@ -13,13 +13,12 @@ interface CartSummaryProps {
 
 export const CartSummary: FC<CartSummaryProps> = ({cart}) => {
   const [open, setOpen] = useState<boolean>(false);
-  console.log("current cart: ", cart)
   return (
     <div className=" flex flex-col gap-2 py-4 mt-4">
       <Separator />
       <div className=" text-md font-semibold flex items-center justify-between">
-        <span>{`Item(s) total:`}</span>
-        <span>{formatCurrency(cart.itemsPrice)}</span>
+        <span>Total:</span>
+        <span>{formatCurrency(cart.totalPrice)}</span>
       </div>
       {(cart.itemsDiscountPrice > 0 || cart.shopDiscountPrice || cart.couponDiscountPrice) &&
       <div className=" text-md font-semibold flex items-center justify-between">
@@ -27,10 +26,14 @@ export const CartSummary: FC<CartSummaryProps> = ({cart}) => {
           <AccordionItem value="discount-total">
             <AccordionTrigger className="py-1">
               <div className="flex items-center justify-between w-full font-semibold">
-                <span>Discount total:</span>
+                <span>Details:</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-1">
+              <div className="text-xs font-normal flex items-center justify-between">
+                <span>Items price:</span>
+                <span className=" text-muted-foreground">{formatCurrency(cart.itemsPrice)}</span>
+              </div>
               {cart.itemsDiscountPrice > 0 && 
               <div className="text-xs font-normal flex items-center justify-between">
                 <span>Items discount:</span>

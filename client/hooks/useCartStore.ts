@@ -163,19 +163,32 @@ export default function useCartService() {
     updateCart(items);
   };
 
+  function calculateTaxAndSubTotalPrices(totalPrice: number, taxRate: number): { subtotal: number; taxprice: number } {
+    // Ensure tax rate is in decimal form (e.g., 19% should be 0.19)
+    const taxRateDecimal = taxRate / 100;
+  
+    // Calculate subtotal
+    const subtotal = totalPrice / (1 + taxRateDecimal);
+  
+    // Calculate taxprice
+    const taxprice = totalPrice - subtotal;
+  
+    // Round to two decimal places
+    const roundedSubtotal = Math.round(subtotal * 100) / 100;
+    const roundedTaxprice = Math.round(taxprice * 100) / 100;
+  
+    return {
+      subtotal: roundedSubtotal,
+      taxprice: roundedTaxprice
+    };
+  }
+
   const calcPrice = (items: OrderItem[]) => {
 
     const shippingPrice = 0;
 
-    const itemsPrice = round2(
-      items.reduce(
-        (acc, item) =>
-          item.discount && item.discount > 0
-            ? acc + (item.price - item.price * item.discount * 0.01) * item.qty
-            : acc + item.price * item.qty,
-        0
-      )
-    );
+    const itemsPrice = round2(items.reduce((acc, item) => acc + item.price * item.qty, 0));
+
     const itemsDiscountPrice = round2(
       items.reduce(
         (acc, item) =>
@@ -195,13 +208,11 @@ export default function useCartService() {
       itemsDiscountPrice + shopDiscountPrice + couponDiscountPrice
     );
 
-    const itemsPriceWithoutTax = round2(
-      totalItemsPrice - (shopTax * 0.01 * totalItemsPrice)
-    );
-    
-    const taxPrice = round2(shopTax * 0.01 * totalItemsPrice);
-    const subTotalPrice = itemsPriceWithoutTax;
-    const totalPrice = round2(subTotalPrice + taxPrice);
+    const finalItemPrice = itemsPrice - totalDiscountPrice;
+    const { subtotal, taxprice } = calculateTaxAndSubTotalPrices(finalItemPrice, shopTax);
+    const taxPrice = taxprice;
+    const subTotalPrice = subtotal;
+    const totalPrice = finalItemPrice;
 
     return {
       itemsPrice,
