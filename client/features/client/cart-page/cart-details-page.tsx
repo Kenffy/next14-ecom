@@ -2,7 +2,7 @@
 
 import { BiSolidCoupon } from "react-icons/bi";
 import Image from "next/image";
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import PaymentSelect from "@/components/PaymentSelect";
 import useCartService from "@/hooks/useCartStore";
 import { Input } from "@/components/ui/input";
@@ -15,12 +15,14 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { CartSummary } from "./cart-summary";
 import { Trash } from "lucide-react";
 import { computeCurrentPrice, computeDiscountPrice } from "@/lib/utils";
+import { CheckoutPage } from "../checkout-page/checkout-page";
 
 interface CartPageProps {
   settings: any;
 }
 
 export const CartDetailsPage: FC<CartPageProps> = (props) => {
+  const [onCheckout, setOnCheckout] = useState<boolean>(false);
   const { settings } = props;
   const cart = useCartService();
 
@@ -37,6 +39,10 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
   const handleDecrement = (item: OrderItem) => {
     cart.decrease(item);
   };
+
+  if(onCheckout){
+    return <CheckoutPage setOnCheckout={setOnCheckout}/>
+  }
 
   return (
     <div className=" w-full container mx-auto min-h-screen flex flex-col gap-4 py-16">
@@ -172,9 +178,9 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
           </div>
         </Card>
 
-        <div className="col-span-1 mt-6 md:mt-0 px-2 md:pl-4 flex flex-col gap-2">
-          <PaymentSelect />
-          <CartSummary cart={cart}/>
+        <div className="col-span-1 sm:mt-0 px-2 md:pl-4 flex flex-col gap-2">
+          {/* <PaymentSelect /> */}
+          <CartSummary cart={cart} onCheckout={onCheckout} setOnCheckout={setOnCheckout}/>
         </div>
       </div>
     </div>

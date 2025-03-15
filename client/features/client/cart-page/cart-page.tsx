@@ -10,8 +10,6 @@ interface CartPageProps {
 export const CartPage: FC<CartPageProps> = (props) => {
 
   return (
-    <div className="w-full min-h-screen">
-        <CartDetailsPage settings={props.settings}/>
-    </div>
+    <CartDetailsPage settings={props.settings}/>
   );
 };

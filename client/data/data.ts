@@ -72,3 +72,46 @@ export const Paymentmethods = [
   },
   // { id: 4, type: "Cash on delivery", icon:"/card", value: "Cash" },
 ];
+
+export const PaymentMethods = [
+  {
+    id: "67a8d354f1415cf70505586a",
+    name: "Mastercard",
+    icon: "/images/mcard.png",
+    available: false,
+  },
+  {
+    id: "67a8d595f1415cf70505589e",
+    name: "Visa",
+    icon: "/images/visa.png",
+    available: false,
+  },
+  {
+    id: "67af1a1372bc0d309c1a6fa4",
+    name: "Google Pay",
+    icon: "/images/gpay.png",
+    available: false,
+  },
+  {
+    id: "67a8d5e8f1415cf7050558b5",
+    name: "Paypal",
+    icon: "/images/paypal.png",
+    available: true,
+  },
+  {
+    id: "67a8d662f1415cf7050558f4",
+    name: "Cash",
+    icon: "/images/cash.png",
+    available: true,
+  },
+];
+
+export const Titles = [
+  { id: 1, label: "Mr", value: "mr" },
+  { id: 2, label: "Mrs", value: "mrs" },
+];
+
+export const Genders = [
+  { id: 1, label: "Male", value: "male" },
+  { id: 2, label: "Female", value: "female" },
+];

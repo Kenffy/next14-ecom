@@ -1,37 +1,19 @@
 "use client";
-import CheckoutAuthOptions from "@/components/CheckoutAuthOptions";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/formatters";
-import { Cart } from "@/schemas/models";
-import { useSession } from "next-auth/react";
-import React, { FC, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { FC } from "react";
+import useCartService from "@/hooks/useCartStore";
 
-interface CartSummaryProps {
-    cart: Cart;
-    onCheckout: boolean;
-    setOnCheckout: React.Dispatch<React.SetStateAction<boolean>>;
+interface CartSummaryPricesProps {
 }
 
-export const CartSummary: FC<CartSummaryProps> = ({cart, setOnCheckout}) => {
-  const { data: session } = useSession();
-  const [open, setOpen] = useState<boolean>(false);
-
-
-  const handleCheckout = () => {
-    if (session && session.user) {
-      setOnCheckout(true);
-    } else {
-      setOpen(true);
-    }
-  }
+export const CartSummaryPrices: FC<CartSummaryPricesProps> = () => {
+    const cart = useCartService();
 
 
   return (
     <div className=" flex flex-col gap-2 pb-4 mt-4 sm:mt-0">
-      <Separator />
       <div className=" text-md font-semibold flex items-center justify-between">
         <span>Total:</span>
         <span>{formatCurrency(cart.totalPrice)}</span>
@@ -97,15 +79,6 @@ export const CartSummary: FC<CartSummaryProps> = ({cart, setOnCheckout}) => {
         <span>{`Total`}</span>
         <span>{formatCurrency(cart.totalPrice)}</span>
       </div>
-
-      <Button
-        disabled={cart.items.length === 0}
-        onClick={handleCheckout}
-        className=" flex items-center justify-center mt-4 w-full font-bold rounded-md duration-100"
-      >
-        <span className=" text-center">Proceed to checkout</span>
-      </Button>
-      {open && !session && <CheckoutAuthOptions onClose={setOpen} />}
     </div>
   );
 }

@@ -1,5 +1,12 @@
 export type ProductType = "simple" | "variable";
 
+export type PaymentType = {
+  id: string;
+  name: string;
+  icon: string;
+  available: boolean;
+}
+
 export const InventoryStatus = [
   "in_stock",
   "out_of_stock",
@@ -176,11 +183,13 @@ export interface UserModel {
 
 export interface AddressModel {
   _id?: string;
+  fullName: string;
   street: string;
   city: string;
-  state: string;
   postalCode: string;
   country: string;
+  userId: string;
+  default?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -193,3 +202,26 @@ export interface CategoryModel {
   brand?: string;
   banner?: string;
 }
+
+export const INITIAL_ADDRESS_DATA: AddressModel = {
+  fullName: "",
+  street: "",
+  city: "",
+  postalCode: "",
+  country: "",
+  userId: ""
+};
+
+export type CardFormData = {
+  fullName: string;
+  cardNumber: string;
+  expirationDate: string;
+  securityCode: number;
+};
+
+export const INITIAL_CARD_DATA: CardFormData = {
+  fullName: "",
+  cardNumber: "",
+  expirationDate: "MM/YY",
+  securityCode: 0,
+};
