@@ -124,12 +124,15 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                 <div className="mt-3 flex items-center gap-3 w-full sm:w-[90%]">
                   <Button
                     onClick={() => props.setOnCheckout(false)}
-                    className="flex-1"
+                    className="flex-1 cursor-pointer"
                     variant="outline"
                   >
                     Back to Cart
                   </Button>
-                  <Button onClick={() => props.setOnCheckout(true)} className="flex-1">
+                  <Button
+                    onClick={() => props.setOnCheckout(true)}
+                    className="flex-1 cursor-pointer"
+                  >
                     Checkout
                   </Button>
                 </div>
