@@ -107,7 +107,7 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4 md:gap-8">
+        <div className="flex items-center gap-6 md:gap-8">
           {/* <div className="cursor-pointer">
             <ToggleTheme />
           </div> */}
@@ -127,7 +127,7 @@ export default function Navbar() {
 
           <div
             onClick={() => setOnMenu((prev) => !prev)}
-            className=" md:hidden cursor-pointer ml-2 border py-1 px-2 rounded-md"
+            className=" md:hidden cursor-pointer border py-1 px-2 rounded-md"
           >
             {onMenu ? <MdClose size={24} /> : <HiOutlineMenuAlt3 size={24} />}
           </div>
