@@ -10,24 +10,10 @@ import React, { FC, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface CartSummaryProps {
-    cart: Cart;
-    onCheckout: boolean;
-    setOnCheckout: React.Dispatch<React.SetStateAction<boolean>>;
+  cart: Cart;
 }
 
-export const CartSummary: FC<CartSummaryProps> = ({cart, setOnCheckout}) => {
-  const { data: session } = useSession();
-  const [open, setOpen] = useState<boolean>(false);
-
-
-  const handleCheckout = () => {
-    if (session && session.user) {
-      setOnCheckout(true);
-    } else {
-      setOpen(true);
-    }
-  }
-
+export const CartSummary: FC<CartSummaryProps> = ({cart}) => {
 
   return (
     <div className=" flex flex-col gap-2 pb-4 mt-4 sm:mt-0">
@@ -97,15 +83,6 @@ export const CartSummary: FC<CartSummaryProps> = ({cart, setOnCheckout}) => {
         <span>{`Total`}</span>
         <span>{formatCurrency(cart.totalPrice)}</span>
       </div>
-
-      <Button
-        disabled={cart.items.length === 0}
-        onClick={handleCheckout}
-        className=" flex items-center justify-center mt-4 w-full font-bold rounded-md duration-100"
-      >
-        <span className=" text-center">Proceed to checkout</span>
-      </Button>
-      {open && !session && <CheckoutAuthOptions onClose={setOpen} />}
     </div>
   );
 }

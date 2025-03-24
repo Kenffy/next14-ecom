@@ -41,7 +41,8 @@ export const LoginPage: FC<LoginProps> = (props) => {
         return;
       }
       setIsPending(false);
-      RedirectToPage("home");
+      //RedirectToPage("home");
+      router.back();
     } catch (error) {
       setIsPending(false);
       setError("Something went wrong.");

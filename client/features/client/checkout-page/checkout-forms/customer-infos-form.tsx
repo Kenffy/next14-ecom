@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 interface CustomerInfoFormProps {
+    customer: any;
+    onChangeValues: (name:string, value: string) => void;
 }
 
 export const CustomerInfoForm: FC<CustomerInfoFormProps> = (props) => {
@@ -64,20 +66,28 @@ export const CustomerInfoForm: FC<CustomerInfoFormProps> = (props) => {
               <div className="flex items-center gap-2">
                 <div className="flex-1 gap-2">
                   <Label>Lastname*</Label>
-                  <Input type="text" name="lastname" placeholder="Lastname" required/>
+                  <Input 
+                  onChange={(e) => props.onChangeValues(e.target.name, e.target.value)} 
+                  type="text" name="lastname" placeholder="Lastname" required/>
                 </div>
                 <div className="flex-1 gap-2">
                   <Label>Firstname*</Label>
-                  <Input type="text" name="firstname" placeholder="Firstname" required/>
+                  <Input 
+                  onChange={(e) => props.onChangeValues(e.target.name, e.target.value)} 
+                  type="text" name="firstname" placeholder="Firstname" required/>
                 </div>
               </div>
               <div className="flex-1 gap-2">
                 <Label>Email*</Label>
-                <Input type="email" name="email" placeholder="Email" required/>
+                <Input 
+                onChange={(e) => props.onChangeValues(e.target.name, e.target.value)} 
+                type="email" name="email" placeholder="Email" required/>
               </div>
               <div className="flex-1 gap-2">
                 <Label>Phone Number</Label>
-                <Input type="text" name="phone" placeholder="Phone Number (optional)" />
+                <Input 
+                onChange={(e) => props.onChangeValues(e.target.name, e.target.value)} 
+                type="text" name="phone" placeholder="Phone Number (optional)" />
               </div>
             </div>
           </CardContent>

@@ -3,17 +3,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-  } from "@/components/ui/form";
-  import { Input } from "@/components/ui/input";
-  import { Button } from "@/components/ui/button";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { RedirectToPage, RevalidateCache } from "../common/navigation-helpers";
 
 type Props = {
   onSignUp: Dispatch<SetStateAction<boolean>>;
@@ -32,6 +35,9 @@ const formSchema = z.object({
 });
 
 export default function SignInForm({ onSignUp }: Props) {
+  const [error, setError] = useState<string>("");
+  const [isPending, setIsPending] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,9 +46,29 @@ export default function SignInForm({ onSignUp }: Props) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const router = useRouter();
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsPending(true);
+    try {
+      const response = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+      if (response?.error) {
+        setError(response?.error!);
+        setIsPending(false);
+        return;
+      }
+      setIsPending(false);
+      RevalidateCache({page: "cart", type: "page"})
+      RedirectToPage("checkout");
+    } catch (error) {
+      setIsPending(false);
+      setError("Failed to sign in: Something went wrong.");
+    }
+  };
 
   return (
     <div>
@@ -51,6 +77,7 @@ export default function SignInForm({ onSignUp }: Props) {
           className=" flex flex-col gap-3"
           onSubmit={form.handleSubmit(onSubmit)}
         >
+          {error && <span className="w-full text-sm text-center text-red-400">{error}</span>}
           <FormField
             control={form.control}
             name="email"
@@ -58,7 +85,7 @@ export default function SignInForm({ onSignUp }: Props) {
               <FormItem>
                 <FormLabel />
                 <FormControl>
-                  <Input type="email" placeholder="Email" {...field} />
+                  <Input type="email" placeholder="Email" {...field} required/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -71,13 +98,15 @@ export default function SignInForm({ onSignUp }: Props) {
               <FormItem>
                 <FormLabel />
                 <FormControl>
-                  <Input type="password" placeholder="Password" {...field} />
+                  <Input type="password" placeholder="Password" {...field} required/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button className=" p-2">Login to continue</Button>
+          <Button type="submit" className=" p-2">
+            {isPending ? "Please wait..." : "Login to continue"}
+          </Button>
         </form>
         <div className=" mt-2 flex justify-end">
           <span

@@ -23,6 +23,11 @@ export const UserMenu = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
+  const handleSignOut = () => {
+    signOut();
+    router.back();
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -82,7 +87,8 @@ export const UserMenu = () => {
         :
         <DropdownMenuItem
           className="flex gap-2"
-          onClick={() => signOut({ callbackUrl: "/" })}
+          //onClick={() => signOut({ callbackUrl: "/" })}
+          onClick={handleSignOut}
         >
           <LogOut {...menuIconProps} size={18} />
           <span>Log out</span>

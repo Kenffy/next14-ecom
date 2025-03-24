@@ -28,6 +28,7 @@ interface AddressFormProps {
     addressList: Array<AddressModel>;
   selectedAddress: AddressModel | null;
   onChange: (address: AddressModel) => void;
+  onChangeValues: (name:string, value: string) => void;
 }
 
 export const AddressForm: FC<AddressFormProps> = (props) => {
@@ -75,6 +76,7 @@ export const AddressForm: FC<AddressFormProps> = (props) => {
                   name="fullName"
                   placeholder="Full Name"
                   value={selectedAddress?.fullName}
+                  onChange={(e) => props.onChangeValues(e.target.name, e.target.value)}
                   required
                 />
               </div>
@@ -85,6 +87,7 @@ export const AddressForm: FC<AddressFormProps> = (props) => {
                   name="street"
                   placeholder="Street"
                   value={selectedAddress?.street}
+                  onChange={(e) => props.onChangeValues(e.target.name, e.target.value)}
                   required
                 />
               </div>
@@ -96,6 +99,7 @@ export const AddressForm: FC<AddressFormProps> = (props) => {
                     name="postalCode"
                     placeholder="Postal Code"
                     value={selectedAddress?.postalCode}
+                    onChange={(e) => props.onChangeValues(e.target.name, e.target.value)}
                     required
                   />
                 </div>
@@ -106,6 +110,7 @@ export const AddressForm: FC<AddressFormProps> = (props) => {
                     name="city"
                     placeholder="City"
                     value={selectedAddress?.city}
+                    onChange={(e) => props.onChangeValues(e.target.name, e.target.value)}
                     required
                   />
                 </div>
@@ -117,6 +122,7 @@ export const AddressForm: FC<AddressFormProps> = (props) => {
                   name="country"
                   placeholder="Country"
                   value={selectedAddress?.country}
+                  onChange={(e) => props.onChangeValues(e.target.name, e.target.value)}
                   required
                 />
               </div>

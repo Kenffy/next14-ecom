@@ -16,13 +16,18 @@ import { CartSummary } from "./cart-summary";
 import { Trash } from "lucide-react";
 import { computeCurrentPrice, computeDiscountPrice } from "@/lib/utils";
 import { CheckoutPage } from "../checkout-page/checkout-page";
+import { useSession } from "next-auth/react";
+import { set } from "mongoose";
+import CheckoutAuthOptions from "@/components/CheckoutAuthOptions";
 
 interface CartPageProps {
   settings: any;
 }
 
 export const CartDetailsPage: FC<CartPageProps> = (props) => {
+  const { data: session } = useSession();
   const [onCheckout, setOnCheckout] = useState<boolean>(false);
+  const [onDialog, setOnDialog] = useState<boolean>(false);
   const { settings } = props;
   const cart = useCartService();
 
@@ -40,8 +45,12 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
     cart.decrease(item);
   };
 
-  if(onCheckout){
-    return <CheckoutPage setOnCheckout={setOnCheckout}/>
+  const handleCheckout = () => {
+    if(session){
+      setOnCheckout(true);
+    } else {
+      setOnDialog(true);
+    }
   }
 
   return (
@@ -79,9 +88,10 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                     </span>
 
                     <div className="bg-red-100 text-red-600 px-2 rounded-full text-sm">
-                    {(item?.discount && item.discount > 0) ? `-${item.discount}%`: ''}
+                      {item?.discount && item.discount > 0
+                        ? `-${item.discount}%`
+                        : ""}
                     </div>
-                    
                   </div>
 
                   <div className=" flex items-center gap-2 md:gap-4">
@@ -89,17 +99,19 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                       <div className="flex items-center gap-3">
                         <span className=" text-sm md:text-md">
                           {`${item.qty}x${
-                            (item.discount && item.discount > 0)
+                            item.discount && item.discount > 0
                               ? formatCurrency(computeDiscountPrice(item))
                               : formatCurrency(item.price)
                           }`}
                         </span>
-                        
+
                         <span className=" line-through text-sm md:text-md text-muted-foreground">
-                          {(item.discount && item.discount > 0) ? `${item.qty}x${formatCurrency(item.price)}` : ''}
+                          {item.discount && item.discount > 0
+                            ? `${item.qty}x${formatCurrency(item.price)}`
+                            : ""}
                         </span>
-                        
-                        {(item.attributes && item.attributes.length > 0) && 
+
+                        {item.attributes && item.attributes.length > 0 && (
                           <div className="flex items-center">
                             <span className=" text-muted-foreground text-sm">
                               {item.attributes
@@ -107,7 +119,7 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
                                 .join(", ")}
                             </span>
                           </div>
-                        }
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3">
@@ -179,10 +191,29 @@ export const CartDetailsPage: FC<CartPageProps> = (props) => {
         </Card>
 
         <div className="col-span-1 sm:mt-0 px-2 md:pl-4 flex flex-col gap-2">
-          {/* <PaymentSelect /> */}
-          <CartSummary cart={cart} onCheckout={onCheckout} setOnCheckout={setOnCheckout}/>
+          <CartSummary cart={cart} />
+          {session && session?.user ?
+          <Link href="/checkout">
+            <Button
+              disabled={cart.items.length === 0}
+              className=" flex items-center justify-center mt-4 w-full font-bold rounded-md duration-100"
+            >
+              <span className=" text-center">Proceed to checkout</span>
+            </Button>
+          </Link>
+          :
+          <Button
+              onClick={handleCheckout}
+              disabled={cart.items.length === 0}
+              className=" flex items-center justify-center mt-4 w-full font-bold rounded-md duration-100"
+            >
+              <span className=" text-center">Proceed to checkout</span>
+            </Button>}
         </div>
       </div>
+      {onDialog && !session && (
+        <CheckoutAuthOptions onClose={setOnDialog} />
+      )}
     </div>
   );
 };

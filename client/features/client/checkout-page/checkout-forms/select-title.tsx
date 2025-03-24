@@ -7,9 +7,13 @@ import {
   } from "@/components/ui/select";
 import { Titles } from "@/data/data";
 
-export default function SelectTitle() {
+interface SelectTitleProps {
+  onChange: (title: string) => void;
+}
+
+export default function SelectTitle(props: SelectTitleProps) {
   return (
-    <Select>
+    <Select onValueChange={(value) => props.onChange(value)}>
       <SelectTrigger>
         <SelectValue placeholder="-- Select --" />
       </SelectTrigger>

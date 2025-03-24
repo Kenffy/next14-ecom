@@ -6,11 +6,11 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import AuthForms from "@/features/auth-page/auth-forms";
 
-type Props = {
+type CheckoutAuthProps = {
   onClose: Dispatch<SetStateAction<boolean>>;
 };
 
-export default function CheckoutAuthOptions({ onClose }: Props) {
+export default function CheckoutAuthOptions(props: CheckoutAuthProps) {
   return (
     <div className=" min-h-screen w-full fixed top-0 left-0 flex justify-center z-50 bg-black/80">
       <Card className=" flex flex-col mx-2 md:mx-0 mt-[60px] md:mt-[80px] w-[90%] md:w-[450px] h-fit  rounded-md">
@@ -18,18 +18,14 @@ export default function CheckoutAuthOptions({ onClose }: Props) {
           <h1 className=" font-bold">Go to checkout</h1>
           <button
             className=" h-[30px] w-[30px] flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20"
-            onClick={() => onClose(false)}
+            onClick={() => props.onClose(false)}
           >
             <MdClose size={22} />
           </button>
         </div>
 
         <div className=" flex items-center justify-center p-4 border-b-[1px]">
-          <Link
-            href={`/checkout?guest=true`}
-            className=" w-full "
-            onClick={() => onClose(false)}
-          >
+          <Link href="/checkout" className="w-full">
             <Button variant="outline" className=" w-full">
               Continue as guest
             </Button>

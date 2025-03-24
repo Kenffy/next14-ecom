@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 
 import {
   Form,
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { RegisterAsync } from "./auth-service";
 
 type Props = {
   onSignIn: Dispatch<SetStateAction<boolean>>;
@@ -36,6 +37,9 @@ const formSchema = z.object({
 });
 
 export default function SignUpForm({ onSignIn }: Props) {
+  const [error, setError] = useState<string>("");
+  const [isPending, setIsPending] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,8 +49,24 @@ export default function SignUpForm({ onSignIn }: Props) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  const onSubmit = async(values: z.infer<typeof formSchema>) => {
+    setIsPending(true);
+    try {
+      const response = await RegisterAsync({
+        email: values.email,
+        username: values.username,
+        password: values.password,
+        isAdmin: false,
+      });
+      if(response.status === "OK") {
+        setIsPending(false);
+        onSignIn(true);
+        return;
+      }
+    } catch (error) {
+      setIsPending(false);
+      setError("Failed to register: Something went wrong.");
+    }
   }
 
   return (
@@ -56,6 +76,7 @@ export default function SignUpForm({ onSignIn }: Props) {
           onSubmit={form.handleSubmit(onSubmit)}
           className=" flex flex-col gap-3"
         >
+          {error && <span className="w-full text-sm text-center text-red-400">{error}</span>}
           <FormField
             control={form.control}
             name="username"
@@ -95,7 +116,9 @@ export default function SignUpForm({ onSignIn }: Props) {
               </FormItem>
             )}
           />
-          <Button className=" p-2 ">Register</Button>
+          <Button type="submit" className=" p-2 ">
+          {isPending ? "Please wait..." : "Register"}
+          </Button>
         </form>
         <div className=" mt-2 flex justify-end">
           <span

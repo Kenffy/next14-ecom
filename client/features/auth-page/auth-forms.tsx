@@ -2,10 +2,13 @@
 import React, { useState } from "react";
 import SignInForm from "./signin-form";
 import SignUpForm from "./signup-form";
-import { Separator } from "@/components/ui/separator";
 import ProvidersForm from "./provider-form";
+import Separator from "@/components/Separator";
 
-export default function AuthForms() {
+interface AuthFormsProps {
+}
+
+export default function AuthForms(props: AuthFormsProps) {
   const [isSignIn, setIsSignIn] = useState<boolean>(true);
 
   return (
