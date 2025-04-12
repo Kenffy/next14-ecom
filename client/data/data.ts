@@ -73,6 +73,8 @@ export const Paymentmethods = [
   // { id: 4, type: "Cash on delivery", icon:"/card", value: "Cash" },
 ];
 
+export type PaymentMethodType = "Card" | "Visa" | "Paypal" | "Pay-Pater" | "Google-Pay" | "Cash";
+
 export const PaymentMethods = [
   {
     id: "67a8d354f1415cf70505586a",
@@ -86,12 +88,12 @@ export const PaymentMethods = [
     icon: "/images/visa.png",
     available: false,
   },
-  {
-    id: "67af1a1372bc0d309c1a6fa4",
-    name: "Google Pay",
-    icon: "/images/gpay.png",
-    available: false,
-  },
+  // {
+  //   id: "67af1a1372bc0d309c1a6fa4",
+  //   name: "Google Pay",
+  //   icon: "/images/gpay.png",
+  //   available: false,
+  // },
   {
     id: "67a8d5e8f1415cf7050558b5",
     name: "Paypal",
@@ -99,11 +101,23 @@ export const PaymentMethods = [
     available: true,
   },
   {
-    id: "67a8d662f1415cf7050558f4",
-    name: "Cash",
-    icon: "/images/cash.png",
+    id: "67xpd5e8f1415cf7050208b5",
+    name: "Sepa",
+    icon: "/images/sepa.png",
     available: true,
   },
+  // {
+  //   id: "67a8d5e8f1415cfanl0558b5",
+  //   name: "Pay Later",
+  //   icon: "/images/paypal.png",
+  //   available: true,
+  // },
+  // {
+  //   id: "67a8d662f1415cf7050558f4",
+  //   name: "Cash",
+  //   icon: "/images/cash.png",
+  //   available: true,
+  // },
 ];
 
 export const Titles = [

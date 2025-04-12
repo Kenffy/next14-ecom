@@ -51,6 +51,15 @@ export interface ProductFilter {
   search: string;
 }
 
+export interface CurrencyModel {
+  name: string;
+  symbol: string;
+  position: string;
+  decimals: number;
+  decimalPoint: string;
+  thousandSeparator: string;
+}
+
 export interface BaseProductModel {
   slug?: string;
   name: string;
@@ -154,6 +163,7 @@ export type Cart = {
   totalDiscountPrice: number;
   paymentMethod: string;
   shippingAddress: AddressModel;
+  currency: CurrencyModel;
 };
 
 export type ProductDimension = {

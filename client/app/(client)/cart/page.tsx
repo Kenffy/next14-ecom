@@ -1,4 +1,6 @@
 import { CartPage } from "@/features/client/cart-page/cart-page";
+
+//import CartPage from "@/features/client/cart-page/custom-cart-page";
 import { GetAppSettings } from "@/lib/app-settings";
 import React from "react";
 
@@ -12,6 +14,7 @@ export default async function Cart() {
   return (
     <main className="flex min-h-screen">
       <CartPage settings={appSettings}/>
+      {/* <CartPage /> */}
     </main>
   );
 }

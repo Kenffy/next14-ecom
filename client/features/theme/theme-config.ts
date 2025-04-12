@@ -1,3 +1,5 @@
+import { ReactPayPalScriptOptions } from "@paypal/react-paypal-js";
+
 export const APP_NAME = `Authentication`;
 export const APP_DESCRIPTION = `${APP_NAME} application and users managements`;
 
@@ -15,3 +17,10 @@ export const Sorts = [
   { id: 3, type: "Highest Price", value: "desc" },
   { id: 4, type: "Most Recent", value: "recent" },
 ];
+
+export const PayInitialOptions: ReactPayPalScriptOptions = {
+  clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+  currency: "EUR",
+  intent: "capture",
+  disableFunding: ["credit", "card","paylater"],
+};

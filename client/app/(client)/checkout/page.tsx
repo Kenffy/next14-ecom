@@ -1,6 +1,7 @@
 import { DisplayError } from "@/components/ui/error/display-error";
 import { GetCategoriesAsync } from "@/features/admin/dashboard/categories/category-service";
 import { GetBaseProductsAsync } from "@/features/admin/dashboard/products/product-service";
+//import CheckoutPage from "@/features/client/checkout-page/custom-checkout-page";
 import { CheckoutPage } from "@/features/client/checkout-page/checkout-page";
 
 export const metadata = {

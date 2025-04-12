@@ -10,6 +10,8 @@ import { AboutSection } from "./about-section";
 import { ContactSection } from "./contact-section";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/nav-bar/Navbar";
+import AudioPlayer from "@/components/AudioPlayer";
+import VideoPlayer from "@/components/VideoPlayer";
 
 
 interface HomePageProps {
@@ -37,6 +39,8 @@ export const HomePage: FC<HomePageProps> = (props) => {
           <ReviewSection />
           <AboutSection />
           <ContactSection />
+          <AudioPlayer src=""/>
+          <VideoPlayer src=""/>
         </div>
 
         <Footer />

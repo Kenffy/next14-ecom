@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { round2 } from "@/lib/utils";
-import { AddressModel, Cart, OrderItem } from "@/schemas/models";
+import { AddressModel, Cart, CurrencyModel, OrderItem } from "@/schemas/models";
 
 const initialState: Cart = {
   items: [],
@@ -20,12 +20,21 @@ const initialState: Cart = {
   totalDiscountPrice: 0,
   paymentMethod: "PayPal",
   shippingAddress: {
+    userId: "",
+    fullName: "",
     street: "",
     city: "",
-    state: "",
     postalCode: "",
     country: "",
   },
+  currency: {
+    name: "EUR",
+    symbol: "€",
+    position: "right",
+    decimals: 2,
+    decimalPoint: ",",
+    thousandSeparator: "."
+  }
 };
 
 export const cartStore = create<Cart>()(
@@ -52,6 +61,7 @@ export default function useCartService() {
     shippingPrice,
     paymentMethod,
     shippingAddress,
+    currency,
   } = cartStore();
 
   const updateCart = (updatedItems: OrderItem[]) => {
@@ -70,8 +80,8 @@ export default function useCartService() {
     cartStore.setState({ shopTax });
   };
 
-  const updateShopSettings = (shopDiscount: number, shopTax: number) => {
-    cartStore.setState({ shopDiscount, shopTax });
+  const updateShopSettings = (shopDiscount: number, shopTax: number, currency: CurrencyModel) => {
+    cartStore.setState({ shopDiscount, shopTax, currency });
   };
 
   const findItem = (item: OrderItem) => {
@@ -246,6 +256,7 @@ export default function useCartService() {
     shippingPrice,
     paymentMethod,
     shippingAddress,
+    currency,
     increase,
     decrease,
     remove,

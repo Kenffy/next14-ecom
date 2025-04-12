@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import SelectTitle from "./select-title";
 import { PaymentMethodForm } from "./payment-method-form";
 import PaymentButtons from "@/components/PayPalButton";
+import { PaypalCheckout } from "@/components/PaypalCheckout";
 
 interface CheckoutFormProps {
   customer: any;
@@ -180,15 +181,20 @@ export const CheckoutForm: FC<CheckoutFormProps> = (props) => {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between gap-3">
-          <PaymentButtons />
-          <Button variant={"outline"} type="button" className="w-full">
-            Cancel
-          </Button>
-          <Button type="submit" className="w-full">
-            Save and Continue
-          </Button>
-          
+        <CardFooter className="flex items-center gap-3">
+        <PaypalCheckout method={selectedMethod?.name as string} />
+          {/* <div className="flex-1">
+            <Button variant={"outline"} type="submit" className="w-full">
+              Cancel
+            </Button>
+          </div>
+          <div className="flex-1 flex flex-col items-center bg-green-200">
+            {!selectedMethod ? <Button className="w-full">
+              Checkout
+            </Button>:
+            <PaypalCheckout method={selectedMethod?.name as string} />
+            }
+          </div> */}
         </CardFooter>
       </form>
     </Card>
