@@ -1,8 +1,8 @@
 import { DisplayError } from "@/components/ui/error/display-error";
-import { GetCategoriesAsync } from "@/features/admin/dashboard/categories/category-service";
-import { GetBaseProductsAsync } from "@/features/admin/dashboard/products/product-service";
-//import CheckoutPage from "@/features/client/checkout-page/custom-checkout-page";
+import { isUserAuthenticated } from "@/features/auth-page/helpers";
 import { CheckoutPage } from "@/features/client/checkout-page/checkout-page";
+import { FindShippingAddressForCurrentUser } from "@/features/client/checkout-page/checkout-services";
+import { GetAppSettings } from "@/lib/app-settings";
 
 export const metadata = {
   title: "TemosCo Checkout",
@@ -10,22 +10,32 @@ export const metadata = {
 };
 
 export default async function Checkout() {
-  // const [paginationResponse, categoryResponse] = await Promise.all([
-  //   GetBaseProductsAsync(filters),
-  //   GetCategoriesAsync(),
-  // ]);
+  const [settingsResponse, userAuthenticated] = await Promise.all([
+    GetAppSettings(),
+    isUserAuthenticated()
+  ]);
 
-  // if (paginationResponse.status !== "OK") {
-  //   return <DisplayError errors={paginationResponse.errors} />;
-  // }
+  if (!settingsResponse) {
+    return <DisplayError errors={[{ message: "App settings couldn't be loaded." }]}/>;
+  }
 
-  // if (categoryResponse.status !== "OK") {
-  //   return <DisplayError errors={categoryResponse.errors} />;
-  // }
+  if(!userAuthenticated) {
+    return (
+      <main className="flex min-h-screen">
+      <CheckoutPage appSettings={settingsResponse.response} addressList={[]}/>
+    </main>
+    )
+  }
+
+  const addressResponse = await FindShippingAddressForCurrentUser();
+
+  if (addressResponse.status !== "OK") {
+    return <DisplayError errors={addressResponse.errors} />;
+  }
 
   return (
     <main className="flex min-h-screen">
-      <CheckoutPage />
+      <CheckoutPage appSettings={settingsResponse.response} addressList={addressResponse.response}/>
     </main>
   );
 }

@@ -42,19 +42,33 @@ import {
 import { CartSummary } from "../cart-page/cart-summary";
 import { CgAppleWatch, CgPaypal, CgShoppingBag } from "react-icons/cg";
 import { FaApple } from "react-icons/fa";
+import CheckoutSkeleton from "./checkout-skeleton-page";
 
-interface CheckoutPageProps {}
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+interface CheckoutPageProps {
+  appSettings: any;
+  addressList: Array<AddressModel>;
+}
 
 const checkoutSchema = z.object({
   email: z.string().email("Email invalide"),
-  firstName: z.string().min(2, "Prénom requis"),
-  lastName: z.string().min(2, "Nom requis"),
-  address: z.string().min(5, "Adresse requise"),
-  city: z.string().min(2, "Ville requise"),
-  postalCode: z.string().min(5, "Code postal requis"),
-  country: z.string().min(2, "Pays requis"),
-  phone: z.string().min(10, "Numéro de téléphone requis"),
-  paymentMethod: z.string().min(1, "Méthode de paiement requise"),
+  firstName: z.string().min(2, "First Name is required"),
+  lastName: z.string().min(2, "Last Name is required"),
+  address: z.string().min(5, "Address is required"),
+  city: z.string().min(2, "City is required"),
+  postalCode: z.string().min(5, "Postal code is required"),
+  country: z.string().min(2, "Country is required"),
+  phone: z.string().min(10, "Phone number is required"),
+  paymentMethod: z.string().min(1, "Payment method is required"),
   cardNumber: z.string().optional(),
   cardExpiry: z.string().optional(),
   cardCvc: z.string().optional(),
@@ -70,17 +84,18 @@ interface PaymentMethod {
 }
 
 const paymentMethods: PaymentMethod[] = [
-  {
-    id: "card",
-    name: "Credit Card",
-    icon: <CreditCard className="h-5 w-5" />,
-    description: "Secure credit card payment",
-  },
+  
   {
     id: "paypal",
     name: "PayPal",
     icon: <CgPaypal className="h-5 w-5" />,
     description: "Quick payment via your PayPal account",
+  },
+  {
+    id: "card",
+    name: "Credit Card",
+    icon: <CreditCard className="h-5 w-5" />,
+    description: "Secure credit card payment",
   },
   {
     id: "apple-pay",
@@ -104,6 +119,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
   const [selectedAddress, setSelectedAddress] = useState<AddressModel | null>(
     null
   );
+
   const [selectedMethod, setSelectedMethod] = useState<PaymentType | null>(
     null
   );
@@ -118,6 +134,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
 
   const {
     register,
+    setValue,
     handleSubmit,
     watch,
     formState: { errors },
@@ -136,15 +153,17 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
     },
   });
 
+  const selectedPaymentMethod = watch("paymentMethod");
+
   const router = useRouter();
 
   useEffect(() => {
     if (cart && cart.items.length === 0) {
-      router.push("/cart");
+      //router.push("/cart");
     }
   }, [cart]);
 
-  const handleShippingAdress = (name: string, value: string) => {
+  const handleSelectAddress = (name: string, value: string) => {
     setSelectedAddress((prev) => ({
       ...prev!,
       [name]: value,
@@ -158,7 +177,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
     }));
   };
 
-  const selectedPaymentMethod = watch("paymentMethod");
+  
 
   const onSubmit = async (data: CheckoutFormData) => {
     console.log("Données soumises:", data);
@@ -207,11 +226,18 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
             <p className="text-center text-gray-600">
               We have sent a confirmation email to{" "}
               <span className="font-medium">votre@email.com</span>.
-              <span>You will soon receive information about the delivery of your order.</span>
+              <span>
+                You will soon receive information about the delivery of your
+                order.
+              </span>
             </p>
             <div className="flex flex-col items-center space-y-4">
               <Button className="w-full sm:w-auto">Track my order</Button>
-              <Button onClick={() => router.push("/shop")} variant="outline" className="w-full sm:w-auto">
+              <Button
+                onClick={() => router.push("/shop")}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
                 Continue shopping
               </Button>
             </div>
@@ -220,6 +246,11 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
       </div>
     );
   }
+
+  if (!cart || cart.items.length === 0) {
+    return <CheckoutSkeleton />;
+  }
+
 
   return (
     <div className=" w-full container mx-auto min-h-screen flex flex-col gap-4 py-16">
@@ -271,9 +302,10 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="firstName">First Name</Label>
+                        <Label htmlFor="firstName">First Name *</Label>
                         <Input
                           id="firstName"
+                          required
                           {...register("firstName")}
                           className={errors.firstName ? "border-red-500" : ""}
                         />
@@ -284,9 +316,10 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                         )}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="lastName">Last Name</Label>
+                        <Label htmlFor="lastName">Last Name *</Label>
                         <Input
                           id="lastName"
+                          required
                           {...register("lastName")}
                           className={errors.lastName ? "border-red-500" : ""}
                         />
@@ -299,10 +332,11 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">Email *</Label>
                       <Input
                         id="email"
                         type="email"
+                        required
                         {...register("email")}
                         className={errors.email ? "border-red-500" : ""}
                       />
@@ -329,9 +363,10 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="address">Address</Label>
+                      <Label htmlFor="address">Address *</Label>
                       <Input
                         id="address"
+                        required
                         {...register("address")}
                         className={errors.address ? "border-red-500" : ""}
                       />
@@ -344,9 +379,10 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="city">City</Label>
+                        <Label htmlFor="city">City *</Label>
                         <Input
                           id="city"
+                          required
                           {...register("city")}
                           className={errors.city ? "border-red-500" : ""}
                         />
@@ -357,9 +393,10 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                         )}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="postalCode">Postal code</Label>
+                        <Label htmlFor="postalCode">Postal code *</Label>
                         <Input
                           id="postalCode"
+                          required
                           {...register("postalCode")}
                           className={errors.postalCode ? "border-red-500" : ""}
                         />
@@ -372,9 +409,10 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
+                      <Label htmlFor="country">Country *</Label>
                       <Input
                         id="country"
+                        required
                         {...register("country")}
                         className={errors.country ? "border-red-500" : ""}
                       />
@@ -387,7 +425,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                   </CardContent>
                   <CardFooter>
                     <Button
-                      type="button"
+                      type="submit"
                       onClick={goToNextStep}
                       className="ml-auto flex items-center"
                     >
@@ -411,6 +449,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                       defaultValue={selectedPaymentMethod}
                       className="space-y-4"
                       {...register("paymentMethod")}
+                      onValueChange={(value) => setValue("paymentMethod", value)}
                     >
                       {paymentMethods.map((method) => (
                         <div
@@ -440,11 +479,12 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                     </RadioGroup>
 
                     {selectedPaymentMethod === "card" && (
-                      <div className="mt-6 space-y-4 border rounded-md p-4 bg-gray-50">
+                      <div className="mt-6 space-y-4 border rounded-md p-4 bg-secondary/30">
                         <div className="space-y-2">
                           <Label htmlFor="cardNumber">Card number</Label>
                           <Input
                             id="cardNumber"
+                            required
                             placeholder="1234 5678 9012 3456"
                             {...register("cardNumber")}
                           />
@@ -454,6 +494,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                             <Label htmlFor="cardExpiry">Expiration date</Label>
                             <Input
                               id="cardExpiry"
+                              required
                               placeholder="MM/AA"
                               {...register("cardExpiry")}
                             />
@@ -462,6 +503,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                             <Label htmlFor="cardCvc">CVC</Label>
                             <Input
                               id="cardCvc"
+                              required
                               placeholder="123"
                               {...register("cardCvc")}
                             />
@@ -514,13 +556,21 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                           <p>Email: {watch("email")}</p>
                           <p>Téléphone: {watch("phone")}</p>
                         </div>
-                        <Button
-                          variant="link"
-                          className="p-0 h-auto text-sm"
-                          onClick={() => setActiveStep("shipping")}
-                        >
-                          Modify
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto text-sm"
+                            onClick={() => setActiveStep("shipping")}
+                          >
+                            Modify
+                          </Button>
+                          {session && session.user && 
+                          <SelectShippingAddressDialog
+                            selectedAddress={selectedAddress as AddressModel}
+                            onChange={setSelectedAddress}
+                            addresses={props.addressList}
+                          />}
+                        </div>
                       </div>
 
                       <Separator />
@@ -531,11 +581,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                         </h3>
                         <div className="mt-2 text-sm text-gray-600">
                           <p>
-                            {
-                              paymentMethods.find(
-                                (m) => m.id === watch("paymentMethod")
-                              )?.name
-                            }
+                            {paymentMethods.find((m) => m.id === watch("paymentMethod"))?.name}
                           </p>
                           {watch("paymentMethod") === "card" &&
                             watch("cardNumber") && (
@@ -621,7 +667,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                       disabled={isProcessing}
                     >
                       {isProcessing ? (
-                        <>Traitement en cours...</>
+                        <>In progress...</>
                       ) : (
                         <>Confirm and pay {cart.totalPrice.toFixed(2)} €</>
                       )}
@@ -685,7 +731,7 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
                 ))}
               </div>
               <CartSummary cart={cart} />
-              <Alert className="bg-secondary border-secondary-foreground/30 mt-4 rounded-md">
+              <Alert className="bg-secondary/30 border mt-4 rounded-md">
                 <AlertDescription className="text-sm text-muted-foreground">
                   Estimated delivery: 2-3 days from Germany
                 </AlertDescription>
@@ -697,6 +743,76 @@ export const CheckoutPage: FC<CheckoutPageProps> = (props) => {
     </div>
   );
 };
+
+function SelectShippingAddressDialog({
+  selectedAddress,
+  addresses,
+  onChange,
+}: {
+  selectedAddress: AddressModel;
+  addresses: Array<AddressModel>;
+  onChange: (address: AddressModel) => void;
+}) {
+  const [selectedId, setSelectedId] = useState<string>();
+
+  const handleChange = (addressId: string) => {
+    const address = addresses.find((address) => address._id === addressId);
+    address && setSelectedId(address?._id);
+  };
+
+  const handleSave = () => {
+    const selected = addresses.find((address) => address._id === selectedId);
+    selected && onChange(selected);
+  };
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="link" className="p-0 h-auto text-sm">
+          Select
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-[80%] md:w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-xl">Select Shipping Address</DialogTitle>
+          <DialogDescription>
+            Please select your shipping address.
+          </DialogDescription>
+        </DialogHeader>
+        <RadioGroup
+          onValueChange={(value) => handleChange(value)}
+          defaultValue={selectedAddress?._id}
+          className="w-full"
+        >
+          <div className="flex flex-col gap-3">
+            {addresses.map((address) => (
+              <div key={address._id} className="flex w-full space-x-3">
+                <RadioGroupItem
+                  value={address._id as string}
+                  id={address._id}
+                />
+                <Label htmlFor={address._id} className="w-full">
+                  <div className="w-full flex flex-col relative pb-3 border-b font-normal">
+                    <span>{`${address.street}`}</span>
+                    <span>{`${address.postalCode}, ${address.city}`}</span>
+                    <span>{`${address.country}`}</span>
+                  </div>
+                </Label>
+              </div>
+            ))}
+          </div>
+        </RadioGroup>
+
+        <DialogFooter>
+          <DialogTrigger asChild>
+            <Button onClick={handleSave} type="submit">
+              Save changes
+            </Button>
+          </DialogTrigger>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 // const test = () => {
 //   return (

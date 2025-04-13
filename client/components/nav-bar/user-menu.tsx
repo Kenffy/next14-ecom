@@ -58,7 +58,7 @@ export const UserMenu = () => {
             </p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuItem onClick={()=> router.push('/settings')}>
+        <DropdownMenuItem onClick={()=> router.push('/profile')}>
           <span>Profile Settings</span>
         </DropdownMenuItem>
         </>

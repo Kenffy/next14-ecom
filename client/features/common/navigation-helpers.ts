@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-type Page = "home" | "cart" | "checkout" | "dashboard" | "login" | "register" | "forgot-password";
+type Page = "home" | "cart" | "checkout" | "shop" | "dashboard" | "login" | "register" | "forgot-password" | "unauthenticated";
 
 export const RevalidateCache = (props: {
   page: Page;

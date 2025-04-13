@@ -3,7 +3,7 @@ import "server-only";
 
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import mongoDbConnection from "@/features/common/services/mongo";
-import { getCurrentUser } from "./helpers";
+import { UserBaseModel, getCurrentUser } from "./helpers";
 import bcrypt from "bcryptjs";
 import { RevalidateCache } from "../common/navigation-helpers";
 import { UserModel } from "@/schemas/models";
@@ -449,6 +449,24 @@ const verifyPassword = async(
         };
     }
 }
+
+export const EnsureUserIsAuthenticated = async (): Promise<
+  ServerActionResponse<UserBaseModel>
+> => {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `You are not authenticated.` }],
+    };
+  }
+
+  return {
+    status: "OK",
+    response: currentUser,
+  };
+};
 
 export const UpdateUserSettings = async (props: {
     user: UserModel;

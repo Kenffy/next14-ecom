@@ -26,6 +26,11 @@ export const getCurrentUser = async (): Promise<UserBaseModel> => {
   throw new Error("User not found");
 };
 
+export const isUserAuthenticated = async (): Promise<boolean> => {
+  const user = await userSession();
+  return !!user;
+};
+
 export const userHashedId = async (): Promise<string> => {
   const user = await userSession();
   if (user) {
